@@ -50,11 +50,3 @@ class OutputNeuron:
                 self.Vm = self.resting_Vm
                 self.firedArray.append(self.t)
         return fired
-
-
-# if __name__ == '__main__':
-#     n = InputNeuron()
-#     n.updateProperties(1)
-#     n.processInput(20, 1, 0.0125)
-#     n.updateProperties(4.5)
-#     print(n.processInput(20, 6, 0.0125), n.firedArray, n.Vm)

@@ -64,9 +64,3 @@ class NeuralNetwork:
 
     def getNeuralNetworkStructure(self):
         return self.network_structure
-
-# if __name__ == '__main__':
-#     n = NeuralNetwork(5, 5, 1, 4)
-#     ineu = n.getNeuralNetworkStructure()
-#     print(ineu.network[list(ineu.network)[0]])
-

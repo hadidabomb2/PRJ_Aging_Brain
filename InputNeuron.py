@@ -35,7 +35,7 @@ class InputNeuron:
 
     # Called on every time step of the simulation on the neuron that's being supplied
     # an input
-    def processInput(self, input_current, sim_time, sim_time_step, fired=False):
+    def processInput(self, input_current, sim_time, sim_time_step, debug=False, fired=False):
         self.t = sim_time
         # Check if during refractory period
         if self.t_ref > 0:
@@ -49,12 +49,6 @@ class InputNeuron:
                 self.t_ref = self.tau_ref
                 self.Vm = self.resting_Vm
                 self.firedArray.append(self.t)
+        if debug:
+            print(self.Vm)
         return fired
-
-
-# if __name__ == '__main__':
-#     n = InputNeuron()
-#     n.updateProperties(1)
-#     n.processInput(20, 1, 0.0125)
-#     n.updateProperties(4.5)
-#     print(n.processInput(20, 6, 0.0125), n.firedArray, n.Vm)

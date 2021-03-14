@@ -2,7 +2,9 @@ import numpy as np
 import random
 import math
 import time as clock
-from threading import Thread
+from pandas import DataFrame
+import matplotlib.pyplot as plt
+
 from NeuralNetwork import NeuralNetwork
 
 
@@ -16,8 +18,9 @@ class BrainSimulator:
         self.network_structure = NeuralNetwork(input_neu_size, output_neu_size, mem_capacity,
                                                synaptic_strength_factor).getNeuralNetworkStructure()
         self.learned_connections = []
+        self.learned_times = []
 
-    def runSimulation(self, input_interval, input_strength):
+    def runSimulation(self, input_interval, input_strength, debug=False):
         timestep = self.timestep
         time = self.time
         network = self.network_structure.network
@@ -26,10 +29,11 @@ class BrainSimulator:
         input_time = input_interval
         chosen_input_node = random.choice(list(network))
         learned_connections = self.learned_connections
+        learned_times = self.learned_times
 
         for i in range(int(simulation_time_steps)):
+            time += timestep
             if round(waiting_time, 5) > 0.0:
-                time += timestep
                 waiting_time -= timestep
 
                 if round(waiting_time, 5) <= 0.0:
@@ -38,9 +42,8 @@ class BrainSimulator:
                     chosen_input_node.updateProperties(time + timestep)
 
             else:
-                time += timestep
                 input_time -= timestep
-                input_fired = chosen_input_node.processInput(input_strength, time, timestep)
+                input_fired = chosen_input_node.processInput(input_strength, time, timestep, debug=debug)
 
                 if input_fired:
                     output_connections = (network[chosen_input_node])
@@ -53,26 +56,28 @@ class BrainSimulator:
                             output_fired = output_node.processInput(connection_strength, time, timestep)
                             if output_fired:
                                 if self.learning_type == 'LTP':
-                                    self.triggerLTP(output_connection, learned_connections)
+                                    self.triggerLTP(output_connection, learned_connections, time, learned_times)
                                 else:
                                     if random.randint(0, 10) < 5:
-                                        self.triggerMIS(output_connection, learned_connections, output_connections)
+                                        self.triggerMIS(output_connection, learned_connections, output_connections,
+                                                        time, learned_times)
                                     else:
-                                        self.triggerLTP(output_connection, learned_connections)
+                                        self.triggerLTP(output_connection, learned_connections, time, learned_times)
 
                 if round(input_time, 5) <= 0.0:
                     waiting_time = input_interval
 
             # clock.sleep(0.1)
 
-    def triggerLTP(self, output_connection, learned_connections):
+    def triggerLTP(self, output_connection, learned_connections, time, learned_times):
         output_connection[1] = output_connection[1] * 2
         learned_connections.append(output_connection)
+        learned_times.append(time)
 
-    def triggerMIS(self, output_connection, learned_connections, output_connections):
+    def triggerMIS(self, output_connection, learned_connections, output_connections, time, learned_times):
         possible_connections = [x for x in output_connections if x not in learned_connections]
         if not possible_connections:
-            self.triggerLTP(output_connection, learned_connections)
+            self.triggerLTP(output_connection, learned_connections, time, learned_times)
         else:
             old_connection = random.choice(possible_connections)
             new_connection = [output_connection[0], old_connection[1]]
@@ -80,12 +85,4 @@ class BrainSimulator:
             output_connections.append(new_connection)
             learned_connections.append(output_connection)
             learned_connections.append(new_connection)
-
-
-if __name__ == '__main__':
-    brain = BrainSimulator(20, 'MIS', 20, 20, .8, 5)
-    brain.runSimulation(.1, 40)
-    print(len(brain.learned_connections))
-    # x = [x for x in range(10)]
-    # y = [y for y in range(10)]
-    # print([z for z in x if z not in y])
+            learned_times.append(time)
