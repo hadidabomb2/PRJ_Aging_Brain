@@ -35,7 +35,7 @@ class OutputNeuron:
 
     # Called on every time step of the simulation on the neuron that's being supplied
     # an input
-    def processInput(self, connection_strength, sim_time, sim_time_step, fired=False):
+    def processInput(self, connection_strength, sim_time, sim_time_step, debug=False, fired=False):
         self.t = sim_time
         # Check if during refractory period
         if self.t_ref > 0:
@@ -49,4 +49,6 @@ class OutputNeuron:
                 self.t_ref = self.tau_ref
                 self.Vm = self.resting_Vm
                 self.firedArray.append(self.t)
+        if debug:
+            print(self.Vm)
         return fired

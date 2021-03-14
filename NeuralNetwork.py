@@ -6,9 +6,25 @@ from InputNeuron import InputNeuron
 from OutputNeuron import OutputNeuron
 
 
+class SynapticConnection:
+    def __init__(self, input_neuron, output_neuron, connection_strength):
+        self.input_neuron = input_neuron
+        self.output_neuron = output_neuron
+        self.connection_strength = connection_strength
+
+    def getInputNeuron(self):
+        return self.input_neuron
+
+    def getOutputNeuron(self):
+        return self.output_neuron
+
+    def getConnectionStrength(self):
+        return self.connection_strength
+
+
 class NeuralNetworkDataStructure:
     def __init__(self, input_neu_size, output_neu_size):
-        self.network = {}
+        self.network = []
         self.input_neurons = [InputNeuron() for i in range(input_neu_size)]
         self.output_neurons = [OutputNeuron() for i in range(output_neu_size)]
 
@@ -18,21 +34,18 @@ class NeuralNetworkDataStructure:
     def getOutputNeuronList(self):
         return self.output_neurons
 
-    # def getInputNeuron(self, index):
-    #     return self.input_neurons[index]
-    #
-    # def getOutputNeuron(self, index):
-    #     return self.output_neurons[index]
-
     def addToNetwork(self, input_neuron, output_neuron, connection_strength):
+        connection = SynapticConnection(input_neuron, output_neuron, connection_strength)
         network = self.network
-        if input_neuron not in network:
-            network[input_neuron] = [[output_neuron, connection_strength]]
-        else:
-            network[input_neuron].append([output_neuron, connection_strength])
+        if connection not in network:
+            network.append(connection)
 
     def getInputNeuronConnections(self, input_neuron):
-        return self.network[input_neuron]
+        network = self.network
+        return [connection for connection in network if connection.getInputNeuron() == input_neuron]
+
+    def getNetwork(self):
+        return self.network
 
 
 class NeuralNetwork:

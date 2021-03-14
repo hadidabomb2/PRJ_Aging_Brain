@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import random
 import math
@@ -5,7 +7,7 @@ import time as clock
 from pandas import DataFrame
 import matplotlib.pyplot as plt
 
-from NeuralNetwork import NeuralNetwork
+from NeuralNetwork import NeuralNetwork, SynapticConnection
 
 
 class BrainSimulator:
@@ -20,14 +22,15 @@ class BrainSimulator:
         self.learned_connections = []
         self.learned_times = []
 
-    def runSimulation(self, input_interval, input_strength, debug=False):
+    def runSimulation(self, input_interval, input_strength, debug=False, callback=None):
         timestep = self.timestep
         time = self.time
-        network = self.network_structure.network
+        network_structure = self.network_structure
+        network = network_structure.getNetwork()
         simulation_time_steps = self.end_time / timestep
         waiting_time = 0.0
         input_time = input_interval
-        chosen_input_node = random.choice(list(network))
+        chosen_input_node = random.choice(list(network)).getInputNeuron()
         learned_connections = self.learned_connections
         learned_times = self.learned_times
 
@@ -38,7 +41,7 @@ class BrainSimulator:
 
                 if round(waiting_time, 5) <= 0.0:
                     input_time = input_interval
-                    chosen_input_node = random.choice(list(network))
+                    chosen_input_node = random.choice(list(network)).getInputNeuron()
                     chosen_input_node.updateProperties(time + timestep)
 
             else:
@@ -46,43 +49,46 @@ class BrainSimulator:
                 input_fired = chosen_input_node.processInput(input_strength, time, timestep, debug=debug)
 
                 if input_fired:
-                    output_connections = (network[chosen_input_node])
-                    for j in range(len(output_connections)):
-                        output_connection = output_connections[j]
-                        if output_connection not in learned_connections:
-                            output_node = output_connection[0]
+                    input_connections = network_structure.getInputNeuronConnections(chosen_input_node)
+                    for j in range(len(input_connections)):
+                        input_connection = input_connections[j]
+                        if input_connection not in learned_connections:
+                            output_node = input_connection.getOutputNeuron()
                             output_node.updateProperties(time)
-                            connection_strength = output_connection[1]
+                            connection_strength = input_connection.getConnectionStrength()
                             output_fired = output_node.processInput(connection_strength, time, timestep)
                             if output_fired:
                                 if self.learning_type == 'LTP':
-                                    self.triggerLTP(output_connection, learned_connections, time, learned_times)
+                                    self.triggerLTP(input_connection, learned_connections, time, learned_times)
                                 else:
                                     if random.randint(0, 10) < 5:
-                                        self.triggerMIS(output_connection, learned_connections, output_connections,
+                                        self.triggerMIS(input_connection, learned_connections, input_connections,
                                                         time, learned_times)
                                     else:
-                                        self.triggerLTP(output_connection, learned_connections, time, learned_times)
+                                        self.triggerLTP(input_connection, learned_connections, time, learned_times)
 
                 if round(input_time, 5) <= 0.0:
                     waiting_time = input_interval
 
-            # clock.sleep(0.1)
+            if callback is not None:
+                callback()
 
-    def triggerLTP(self, output_connection, learned_connections, time, learned_times):
-        output_connection[1] = output_connection[1] * 2
-        learned_connections.append(output_connection)
+
+    def triggerLTP(self, input_connection, learned_connections, time, learned_times):
+        input_connection.connection_strength = input_connection.getConnectionStrength() * 2
+        learned_connections.append(input_connection)
         learned_times.append(time)
 
-    def triggerMIS(self, output_connection, learned_connections, output_connections, time, learned_times):
-        possible_connections = [x for x in output_connections if x not in learned_connections]
+    def triggerMIS(self, input_connection, learned_connections, input_connections, time, learned_times):
+        possible_connections = [x for x in input_connections if x not in learned_connections]
         if not possible_connections:
-            self.triggerLTP(output_connection, learned_connections, time, learned_times)
+            self.triggerLTP(input_connection, learned_connections, time, learned_times)
         else:
             old_connection = random.choice(possible_connections)
-            new_connection = [output_connection[0], old_connection[1]]
-            output_connections.remove(old_connection)
-            output_connections.append(new_connection)
-            learned_connections.append(output_connection)
+            new_connection = SynapticConnection(input_connection.getInputNeuron(), old_connection.getOutputNeuron(),
+                                                old_connection.getConnectionStrength())
+            self.network_structure.network.remove(old_connection)
+            self.network_structure.network.append(new_connection)
+            learned_connections.append(input_connection)
             learned_connections.append(new_connection)
             learned_times.append(time)
