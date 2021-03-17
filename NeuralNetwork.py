@@ -41,7 +41,7 @@ class NeuralNetworkDataStructure:
             network.append(connection)
 
     def getInputNeuronConnections(self, input_neuron):
-        network = self.network
+        network = self.getNetwork()
         return [connection for connection in network if connection.getInputNeuron() == input_neuron]
 
     def getNetwork(self):

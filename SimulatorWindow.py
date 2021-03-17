@@ -4,19 +4,22 @@
 
 import random
 import tkinter as tk
-from tkinter import ttk
-
 import time as clock
+from tkinter import ttk
 from BrainSimulator import BrainSimulator
 
 
-class App(tk.Tk):
-    def __init__(self, *args, **kwargs):
+class SimulatorApp(tk.Tk):
+    def __init__(self, end_time, learning_type, input_neu_size, output_neu_size, mem_capacity,
+                 dec_synaptic_strength, inc_neurodegen, neu_input_curr, neu_input_intervals, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+        brain = BrainSimulator(20, 'MIS', 20, 10, 1, 5)
+        self.brain = brain
+
         self.geometry("1080x720")
         container = ttk.Frame(self)
-        canvas = tk.Canvas(container, width=540, height=1080, borderwidth=0)
-        self.canvas = canvas
+        self.canvas = tk.Canvas(container, width=540, height=1080, borderwidth=0)
+        canvas = self.canvas
         scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
         scrollable_frame = ttk.Frame(canvas)
 
@@ -36,8 +39,6 @@ class App(tk.Tk):
         self.connections = []
         self.changed_learned_connections = []
 
-        brain = BrainSimulator(20, 'LTP', 15, 15, .8, 5)
-        self.brain = brain
         input_neuron_list = brain.network_structure.getInputNeuronsList()
         output_neuron_list = brain.network_structure.getOutputNeuronList()
         input_centering = 0
@@ -47,8 +48,6 @@ class App(tk.Tk):
             output_centering = height_diff / 2
         elif height_diff < 0:
             input_centering = abs(height_diff / 2)
-
-        network = brain.network_structure.network
 
         oval_spacing = 7
         for i, input_neuron in enumerate(input_neuron_list):
@@ -80,17 +79,43 @@ class App(tk.Tk):
                 self.connections.append([connection, canvas.create_line(x1, y1, x2, y2, fill="grey",
                                                                         tags="connection")])
 
-        run_simulation = tk.Button(container, text="Run Simulation", command=self.buttonCommand)
+        run_simulation = tk.Button(canvas, text="Run Simulation", command=self.buttonCommand)
         container.pack(side="left", fill="both", expand=True)
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
-        run_simulation.pack(side="right")
+        run_simulation.pack(side="top")
 
     def buttonCommand(self):
-        self.brain.runSimulation(.05, 5, callback=self.redraw)
+        if self.brain.learning_type == 'MIS':
+            self.brain.runSimulation(.05, 5, updateCanvas=self.updateCanvas, updateConnections=self.updateConnections)
+        else:
+            self.brain.runSimulation(.05, 5, updateCanvas=self.updateCanvas)
+
         print("Simulation Ended")
 
-    def redraw(self):
+    def updateConnections(self, new_connection, old_connection):
+        canvas = self.canvas
+        connections = self.connections
+        old_connection_canvas = [x for x in connections if x[0] == old_connection][0]
+        canvas.delete(old_connection_canvas[1])
+        connections.remove(old_connection_canvas)
+        output_neuron_id = [x[1] for x in self.output_neurons if x[0] == new_connection.getOutputNeuron()][0]
+        output_neuron_coords = canvas.coords(output_neuron_id)
+        input_neuron_id = [x[1] for x in self.input_neurons if x[0] == new_connection.getInputNeuron()][0]
+        input_neuron_coords = canvas.coords(input_neuron_id)
+        x1 = input_neuron_coords[2] - ((input_neuron_coords[2] - input_neuron_coords[0]) / 2)
+        y1 = input_neuron_coords[3] - ((input_neuron_coords[3] - input_neuron_coords[1]) / 2)
+        x2 = output_neuron_coords[2] - ((output_neuron_coords[2] - output_neuron_coords[0]) / 2)
+        y2 = output_neuron_coords[3] - ((output_neuron_coords[3] - output_neuron_coords[1]) / 2)
+        x3 = abs(x2 + x1) / 2 + random.randint(-self.cellwidth, self.cellwidth)
+        y3 = abs(y2 + y1) / 2 + random.randint(-self.cellheight, self.cellheight)
+
+        connections.append([new_connection, self.canvas.create_line(x1, y1, x3, y3, x2, y2, fill="grey", smooth=1,
+                                                                    tags="connection")])
+
+        self.update()
+
+    def updateCanvas(self):
         canvas = self.canvas
         learned_connections = self.brain.learned_connections
         input_neurons = self.input_neurons
@@ -99,8 +124,6 @@ class App(tk.Tk):
         output_neurons = self.output_neurons
         for output_neuron in output_neurons:
             canvas.itemconfig(output_neuron[1], fill="green")
-        # self.update()
-        # clock.sleep(0.2)
         connections = self.connections
         changed_learned_connections = self.changed_learned_connections
         unchanged_learned_connections = [x for x in learned_connections if x not in changed_learned_connections]
@@ -114,14 +137,14 @@ class App(tk.Tk):
             connection_id = [x[1] for x in connections if x[0] == learned_connection][0]
             canvas.itemconfig(output_neuron_id, fill="red")
             canvas.itemconfig(input_neuron_id, fill="red")
-            canvas.itemconfig(connection_id, fill="red")
+            canvas.itemconfig(connection_id, fill="red", width=2)
             changed_learned_connections.append(learned_connection)
         self.update()
 
         if changed:
-            clock.sleep(0.2)
+            clock.sleep(0.5)
 
 
 if __name__ == "__main__":
-    app = App()
+    app = SimulatorApp()
     app.mainloop()
