@@ -24,7 +24,8 @@ class InputNeuron:
         self.Vm = self.resting_Vm  # Neuron membrane potential (mV)
         self.t_ref = 0  # Neuron refractory time left (ms)
         self.t = 0  # Neuron last updated time (ms)
-        self.firedArray = []
+        self.fired_array = []
+        self.Vm_array = []
 
     # Called once on all input neurons when current is about to be supplied to them
     def updateProperties(self, sim_time):
@@ -48,7 +49,7 @@ class InputNeuron:
                 fired = True
                 self.t_ref = self.tau_ref
                 self.Vm = self.resting_Vm
-                self.firedArray.append(self.t)
+                self.fired_array.append(self.t)
         if debug:
-            print(self.Vm)
+            self.Vm_array.append(self.Vm)
         return fired

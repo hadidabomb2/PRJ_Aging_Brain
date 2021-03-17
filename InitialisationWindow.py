@@ -29,18 +29,18 @@ class InitialisationApp(tk.Tk):
         # self.nnf_title.bind("<Leave>", self.nnfTitleOnLeave)
 
         no_input_neu_label = tk.Label(neural_network_factors, text="Number of Input Neurons").grid(column=0, row=1)
-        self.no_input_neu = tk.IntVar(value=20)
+        self.no_input_neu = tk.IntVar(value=10)
         no_input_neu_input = tk.Entry(neural_network_factors, width="15", textvariable=self.no_input_neu).grid(column=1,
                                                                                                                row=1)
 
         no_output_neu_label = tk.Label(neural_network_factors, text="Number of Output Neurons").grid(column=0, row=2)
-        self.no_output_neu = tk.IntVar(value=20)
+        self.no_output_neu = tk.IntVar(value=10)
         no_output_neu_input = tk.Entry(neural_network_factors, width="15", textvariable=self.no_output_neu).grid(
             column=1,
             row=2)
 
         neu_input_curr_label = tk.Label(neural_network_factors, text="Neuron Input Current (A)").grid(column=0, row=3)
-        self.neu_input_curr = tk.IntVar(value=80)
+        self.neu_input_curr = tk.IntVar(value=5)
         neu_input_curr_input = tk.Entry(neural_network_factors, width="15", textvariable=self.neu_input_curr).grid(
             column=1,
             row=3)
@@ -54,6 +54,11 @@ class InitialisationApp(tk.Tk):
         self.sim_end_time = tk.IntVar(value=30)
         sim_end_time_input = tk.Entry(neural_network_factors, width="15",
                                       textvariable=self.sim_end_time).grid(column=1, row=5)
+
+        mem_capacity_label = tk.Label(neural_network_factors, text="Memory Capacity (%)").grid(column=0, row=6)
+        self.mem_capacity = tk.IntVar(value=80)
+        mem_capacity_input = tk.Entry(neural_network_factors, width="15", textvariable=self.mem_capacity).grid(column=1,
+                                                                                                           row=6)
 
         self.aged_brain_factors_title = tk.Label(aged_brain_factors, text="Aged Brain Factors")
         self.aged_brain_factors_title.grid(column=0, row=0, columnspan=2)
@@ -71,11 +76,6 @@ class InitialisationApp(tk.Tk):
         self.inhibited_LTP = tk.IntVar()
         inhibited_LTP_input = tk.Checkbutton(aged_brain_factors, variable=self.inhibited_LTP).grid(column=1, row=3)
 
-        mem_capacity_label = tk.Label(aged_brain_factors, text="Memory Capacity (%)").grid(column=0, row=4)
-        self.mem_capacity = tk.IntVar(value=80)
-        mem_capacity_input = tk.Entry(aged_brain_factors, width="15", textvariable=self.mem_capacity).grid(column=1,
-                                                                                                           row=4)
-
     # def nnfTitleOnEnter(self, event):
     #     self.nnf_title.configure(text="Hello world")
     #
@@ -85,7 +85,7 @@ class InitialisationApp(tk.Tk):
     def generateModel(self):
         SimulatorApp(self.sim_end_time.get(), self.inhibited_LTP.get(), self.no_input_neu.get(),
                      self.no_output_neu.get(), self.mem_capacity.get(), self.dec_synaptic_str.get(),
-                     self.inc_neurodegen.get(), self.neu_input_curr.get(), self.neu_input_intervals.get())
+                     self.inc_neurodegen.get(), self.neu_input_intervals.get(), self.neu_input_curr.get())
         self.destroy()
 
 

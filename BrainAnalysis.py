@@ -19,9 +19,20 @@ def initialiseAndRunBrainSimulation(end_time, learning_type, input_neu_size, out
 
 
 def debugNeuron():
-    brain = BrainSimulator(100, 'LTP', 10, 10, 1, 5)
+    brain = BrainSimulator(100, 'LTP', 3, 3, 1, 5)
     brain.runSimulation(.05, 2, debug=True)
-
+    print(brain.network_structure.getInputNeuronsList()[0].Vm_array)
+    d1 = getDataFrameGroupedByTimeAndMaximised(brain.network_structure.getInputNeuronsList()[0].Vm_array)
+    d2 = getDataFrameGroupedByTimeAndMaximised(brain.network_structure.getInputNeuronsList()[1].Vm_array)
+    d3 = getDataFrameGroupedByTimeAndMaximised(brain.network_structure.getInputNeuronsList()[2].Vm_array)
+    plt.plot(d1['Time'], d1['No_Spiked'], label="LTP - 100% Memory Capacity")
+    plt.plot(d2['Time'], d2['No_Spiked'], label="LTP - 80% Memory Capacity")
+    plt.plot(d3['Time'], d3['No_Spiked'], label="LTP - 60% Memory Capacity")
+    plt.legend(loc="upper left")
+    plt.title("Comparing Memory Capacity w/ LTM Mechanisms (LTP & MIS)")
+    plt.xlabel("Time (ms)")
+    plt.ylabel("No. of Output Nodes Spiked")
+    plt.show()
 
 def comparingMemoryMechanismBasic(end_time, input_neu_size, output_neu_size, synaptic_strength_factor, input_interval,
                                   input_strength):
@@ -145,5 +156,5 @@ if __name__ == '__main__':
     # comparingOutputNeuronAmountBasic('MIS')
     # comparingOutputNeuronAmountBasic('LTP')
     # comparingOutputNeuronAmountBasic('MIS')
-    # debugNeuron()
+    debugNeuron()
     print("Ended")
