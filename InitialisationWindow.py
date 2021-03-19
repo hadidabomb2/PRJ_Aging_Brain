@@ -56,7 +56,7 @@ class InitialisationApp(tk.Tk):
                                       textvariable=self.sim_end_time).grid(column=1, row=5)
 
         mem_capacity_label = tk.Label(neural_network_factors, text="Memory Capacity (%)").grid(column=0, row=6)
-        self.mem_capacity = tk.IntVar(value=80)
+        self.mem_capacity = tk.IntVar(value=100)
         mem_capacity_input = tk.Entry(neural_network_factors, width="15", textvariable=self.mem_capacity).grid(column=1,
                                                                                                            row=6)
 

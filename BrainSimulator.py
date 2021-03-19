@@ -18,7 +18,8 @@ class BrainSimulator:
         self.learned_connections = []
         self.learned_times = []
 
-    def runSimulation(self, input_interval, input_strength, debug=False, updateCanvas=None, updateConnections=None):
+    def runSimulation(self, input_interval, input_strength, debug=False, analysis=False, updateCanvas=None,
+                      updateConnections=None):
         timestep = self.timestep
         time = self.time
         network_structure = self.network_structure
@@ -61,18 +62,22 @@ class BrainSimulator:
                                     self.triggerLTP(input_connection, learned_connections, time, learned_times)
                                 else:
                                     if random.randint(0, 10) < 10:
-                                        input_connections = network_structure.\
+                                        input_connections = network_structure. \
                                             getInputNeuronConnections(chosen_input_node)
                                         self.triggerMIS(input_connection, learned_connections, input_connections,
-                                                        time, learned_times, old_connections, adding_temp, removing_temp)
+                                                        time, learned_times, old_connections, adding_temp,
+                                                        removing_temp)
                                     else:
                                         self.triggerLTP(input_connection, learned_connections, time, learned_times)
 
                     if self.learning_type == "MIS":
                         for k in range(len(adding_temp)):
-                            self.network_structure.network.append(adding_temp[k])
-                            self.network_structure.network.remove(removing_temp[k])
-                            updateConnections(new_connection=adding_temp[k], old_connection=removing_temp[k])
+                            new_connection = adding_temp[k]
+                            old_connection = removing_temp[k]
+                            self.network_structure.network.append(new_connection)
+                            self.network_structure.network.remove(old_connection)
+                            if not analysis:
+                                updateConnections(new_connection=new_connection, old_connection=old_connection)
 
                 if round(input_time, 5) <= 0.0:
                     waiting_time = input_interval
@@ -88,7 +93,8 @@ class BrainSimulator:
     def triggerMIS(self, input_connection, learned_connections, input_connections, time, learned_times,
                    old_connections, adding_temp, removing_temp):
         possible_connections = [x for x in input_connections if not ((x in learned_connections)
-                                or (x in old_connections) or (x == input_connection))]
+                                                                     or (x in old_connections) or (
+                                                                             x == input_connection))]
         if not possible_connections:
             self.triggerLTP(input_connection, learned_connections, time, learned_times)
         else:

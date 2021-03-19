@@ -25,7 +25,7 @@ class OutputNeuron:
         self.t_ref = 0  # Neuron refractory time left (ms)
         self.t = 0  # Neuron last updated time (ms)
         self.fired_array = []
-        self.Vm_array = []
+        self.tracking_Vm = []
 
     # Called once on output neurons when current is about to be supplied to them
     def updateProperties(self, sim_time):
@@ -40,9 +40,11 @@ class OutputNeuron:
         self.t = sim_time
         # Check if during refractory period
         if self.t_ref > 0:
+            self.tracking_Vm.append([self.Vm, self.t])
             self.t_ref -= sim_time_step
         else:
             self.Vm += (-self.Vm + self.Rm * connection_strength) / self.tau_m
+            self.tracking_Vm.append([self.Vm, self.t])
             # Check if membrane potential is higher than threshold potential
             if self.Vm >= self.Vth:
                 # Fire neuron spike
@@ -51,5 +53,5 @@ class OutputNeuron:
                 self.Vm = self.resting_Vm
                 self.fired_array.append(self.t)
         if debug:
-            self.Vm_array.append(self.Vm)
+            print(self.Vm)
         return fired

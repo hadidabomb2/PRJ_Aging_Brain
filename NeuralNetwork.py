@@ -71,9 +71,20 @@ class NeuralNetwork:
                 initial_neu_network.addToNetwork(input_neurons[input_neu_idx], random_output_neuron, random_weight)
 
     def generateSynapticWeights(self, input_neu_size, output_neu_size):
-        dirichlet_dist = np.random.dirichlet(np.ones(output_neu_size) * 100)
+        dirichlet_dist = np.random.dirichlet(np.ones(output_neu_size) * 1000)
+        # all_weights_dist = []
+        # for i in range(input_neu_size):
+        #     temp = []
+        #     for j in range(output_neu_size):
+        #         temp.append(random.randint(self.synaptic_strength_factor - 2, self.synaptic_strength_factor + 2))
+        #     all_weights_dist.append(temp)
+        # print(all_weights_dist)
         return np.random.multinomial(output_neu_size * self.synaptic_strength_factor, dirichlet_dist,
                                      size=input_neu_size)
 
     def getNeuralNetworkStructure(self):
         return self.network_structure
+
+
+if __name__ == '__main__':
+    NeuralNetwork(30, 30, 1, 5)
