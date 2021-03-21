@@ -12,7 +12,7 @@ import random
 import math
 
 
-class OutputNeuron:
+class Neuron:
     def __init__(self):
         self.tau_ref = random.uniform(3, 4)  # Average neuronal refractory period (ms)
         self.resting_Vm = 0  # Neuron resting membrane potential (mV)
@@ -27,7 +27,7 @@ class OutputNeuron:
         self.fired_array = []
         self.tracking_Vm = []
 
-    # Called once on output neurons when current is about to be supplied to them
+    # Called once on all input neurons when current is about to be supplied to them
     def updateProperties(self, sim_time):
         delta_time = sim_time - self.t  # Time passed since last update
         self.Vm = self.Vm * math.exp(-delta_time / self.tau_m)  # Update new membrane potential
@@ -36,14 +36,14 @@ class OutputNeuron:
 
     # Called on every time step of the simulation on the neuron that's being supplied
     # an input
-    def processInput(self, connection_strength, sim_time, sim_time_step, debug=False, fired=False):
+    def processInput(self, input_strength, sim_time, sim_time_step, debug=False, fired=False):
         self.t = sim_time
         # Check if during refractory period
         if self.t_ref > 0:
-            self.tracking_Vm.append([self.Vm, self.t])
             self.t_ref -= sim_time_step
+            self.tracking_Vm.append([self.Vm, self.t])
         else:
-            self.Vm += (-self.Vm + self.Rm * connection_strength) / self.tau_m
+            self.Vm += (-self.Vm + self.Rm * input_strength) / self.tau_m
             self.tracking_Vm.append([self.Vm, self.t])
             # Check if membrane potential is higher than threshold potential
             if self.Vm >= self.Vth:

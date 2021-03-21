@@ -2,8 +2,7 @@ import numpy as np
 import random
 import math
 import time as clock
-
-from NeuralNetwork import NeuralNetwork, SynapticConnection
+from model.NeuralNetwork import NeuralNetwork, SynapticConnection
 
 
 class BrainSimulator:
@@ -14,7 +13,7 @@ class BrainSimulator:
         self.timestep = 0.0125
         self.learning_type = learning_type
         self.network_structure = NeuralNetwork(input_neu_size, output_neu_size, mem_capacity,
-                                               synaptic_strength_factor).getNeuralNetworkStructure()
+                                               synaptic_strength_factor).getNeuralNetwork()
         self.learned_connections = []
         self.learned_times = []
 

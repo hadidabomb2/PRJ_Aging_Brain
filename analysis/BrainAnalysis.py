@@ -1,7 +1,6 @@
 from BrainSimulator import BrainSimulator
 from pandas import DataFrame
 import matplotlib.pyplot as plt
-import numpy as np
 
 
 def getDataFrameGroupedByTimeAndMaximised(values):
@@ -170,9 +169,9 @@ def comparingInputAmountNeurons(end_time, learning_type, synaptic_strength_facto
 
 
 if __name__ == '__main__':
-    comparingMemoryMechanismBasic(400, 50, 50, 5, .025, 5)
-    comparingSynapticStrengthBasic(300, 'LTP', 50, 50, .025, 5)
-    comparingInputAmountNeurons(300, 'LTP', 5, .025, 5)
+    comparingMemoryMechanismBasic(100, 50, 50, 5, .025, 5)
+    comparingSynapticStrengthBasic(100, 'LTP', 50, 50, .025, 5)
+    comparingInputAmountNeurons(100, 'LTP', 5, .025, 5)
     # comparingMemoryCapacityBasic('LTP')
     # comparingMemoryCapacityBasic('MIS')
     # comparingSynapticStrengthBasic('LTP')

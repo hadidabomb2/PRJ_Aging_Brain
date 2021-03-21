@@ -4,7 +4,7 @@
 import random
 import tkinter as tk
 from tkinter import ttk
-from SimulatorWindow import SimulatorApp
+from view.SimulatorWindow import SimulatorWindow
 
 
 class InitialisationApp(tk.Tk):
@@ -83,7 +83,7 @@ class InitialisationApp(tk.Tk):
     #     self.nnf_title.configure(text="")
 
     def generateModel(self):
-        SimulatorApp(self.sim_end_time.get(), self.inhibited_LTP.get(), self.no_input_neu.get(),
+        SimulatorWindow(self.sim_end_time.get(), self.inhibited_LTP.get(), self.no_input_neu.get(),
                      self.no_output_neu.get(), self.mem_capacity.get(), self.dec_synaptic_str.get(),
                      self.inc_neurodegen.get(), self.neu_input_intervals.get(), self.neu_input_curr.get())
         self.destroy()

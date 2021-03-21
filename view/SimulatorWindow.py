@@ -2,16 +2,12 @@
 # https://stackoverflow.com/questions/4781184/tkinter-displaying-a-square-grid
 # https://stackoverflow.com/questions/40843039/how-to-write-a-simple-callback-function
 
-import random
 import tkinter as tk
-import time as clock
-from tkinter import ttk
 
-from BrainFrame import BrainFrame
-from BrainSimulator import BrainSimulator
+from view.BrainFrame import BrainFrame
 
 
-class SimulatorApp(tk.Tk):
+class SimulatorWindow(tk.Tk):
     def __init__(self, end_time, learning_type_boolean, input_neu_size, output_neu_size, mem_capacity,
                  dec_synaptic_strength, inc_neurodegen, neu_input_intervals, neu_input_curr, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -59,5 +55,5 @@ class SimulatorApp(tk.Tk):
         aged_brain = BrainFrame(aged_brain_args, self)
 
 # if __name__ == "__main__":
-#     app = SimulatorApp()
+#     app = SimulatorWindow()
 #     app.mainloop()
