@@ -11,7 +11,7 @@ from model.SynapticConnection import SynapticConnection
 # data handling and management within our simulation.
 class NeuralNetworkDataStructure:
     def __init__(self, input_neu_size, output_neu_size):
-        self.network = []
+        self.connections = []
         # Makes a list of size input_neu_size containing InputNeuron objects
         self.input_neurons = [InputNeuron() for i in range(input_neu_size)]
         # Makes a list of size output_neu_size containing OutputNeuron objects
@@ -26,21 +26,38 @@ class NeuralNetworkDataStructure:
         return self.output_neurons
 
     # Takes in an input neuron, an output neuron and a number representing the strength of the connection. Makes a
-    # synaptic connection with those parameters and adds it to the network if connection has not been already added.
+    # synaptic connection with those parameters and adds it to the list of connections if the connection has not been
+    # already added.
     def addToNetwork(self, input_neuron, output_neuron, connection_strength):
         connection = SynapticConnection(input_neuron, output_neuron, connection_strength)
-        network = self.getNetwork()
-        if connection not in network:
-            network.append(connection)
+        connections = self.getConnections()
+        if connection not in connections:
+            connections.append(connection)
+
+    # Same as the method above but takes in a connection directly. This method is only used when the learning type is
+    # MIS and a connection needs to be added mid simulation.
+    def addConnectionToNetwork(self, connection):
+        connections = self.getConnections()
+        if connection not in connections:
+            connections.append(connection)
+
+    # Removes a connection from the list of connections if it exists. This method is also only used when the learning
+    # type is MIS but when a connection needs to be removed mid simulation instead.
+    def removeConnectionFromNetwork(self, connection):
+        connections = self.getConnections()
+        if connection in connections:
+            connections.remove(connection)
 
     # Returns a list of all connections that start from the input neuron specified (passed by parameters).
     def getInputNeuronConnections(self, input_neuron):
-        network = self.getNetwork()
-        return [connection for connection in network if connection.getInputNeuron() == input_neuron]
+        connections = self.getConnections()
+        return [connection for connection in connections if connection.getInputNeuron() == input_neuron]
 
-    # Returns the network.
-    def getNetwork(self):
-        return self.network
+    # Returns the list of connections.
+    def getConnections(self):
+        return self.connections
+
+
 
 
 # The neural network that represents a neural network using the data structure defined above and further logic.
@@ -65,7 +82,6 @@ class NeuralNetwork:
     def generateNeuralNetwork(self, neural_network, input_neurons, output_neurons, connections_per_neu):
         # A multinomial distribution of all the weights that will be used for defining connection weights.
         all_weights_dist = self.generateSynapticWeights(len(input_neurons), len(output_neurons))
-        print(all_weights_dist)
         for input_neu_idx in range(len(input_neurons)):
             weights_dist = all_weights_dist[input_neu_idx].tolist()
             output_neurons_temp = output_neurons[:]
@@ -81,12 +97,16 @@ class NeuralNetwork:
                 neural_network.addToNetwork(input_neurons[input_neu_idx], random_output_neuron, random_weight)
         return neural_network
 
-    # Generate and returns an array of "input neuron size" by "output neuron size" filled with
+    # Generate and returns an array of "input neuron size" by "output neuron size" filled with random values
+    # that vary around the synaptic strength factor.
     def generateSynapticWeights(self, input_neu_size, output_neu_size):
+        # The array of ones is multiplied by a very large number to cause the bins to approach a Poisson distribution
+        # with a mean of self.synaptic_strength_factor.
         dirichlet_dist = np.random.dirichlet(np.ones(output_neu_size) * 1000)
         return np.random.multinomial(output_neu_size * self.synaptic_strength_factor, dirichlet_dist,
                                      size=input_neu_size)
 
+    # Return the neural network
     def getNeuralNetwork(self):
         return self.neural_network
 

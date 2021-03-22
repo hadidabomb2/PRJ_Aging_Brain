@@ -27,7 +27,7 @@ class Neuron:
         self.fired_array = []
         self.tracking_Vm = []
 
-    # Called once on all input neurons when current is about to be supplied to them
+    # Called once on all input neurons when current is about to be supplied to them.
     def updateProperties(self, sim_time):
         delta_time = sim_time - self.t  # Time passed since last update
         self.Vm = self.Vm * math.exp(-delta_time / self.tau_m)  # Update new membrane potential
@@ -35,7 +35,7 @@ class Neuron:
         self.t = sim_time  # Update last updated time
 
     # Called on every time step of the simulation on the neuron that's being supplied
-    # an input
+    # an input. Returns a boolean value saying if the input node has been fired or not.
     def processInput(self, input_strength, sim_time, sim_time_step, debug=False, fired=False):
         self.t = sim_time
         # Check if during refractory period

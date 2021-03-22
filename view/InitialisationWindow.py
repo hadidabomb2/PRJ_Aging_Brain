@@ -40,18 +40,18 @@ class InitialisationApp(tk.Tk):
             row=2)
 
         neu_input_curr_label = tk.Label(neural_network_factors, text="Neuron Input Current (A)").grid(column=0, row=3)
-        self.neu_input_curr = tk.IntVar(value=5)
+        self.neu_input_curr = tk.IntVar(value=4)
         neu_input_curr_input = tk.Entry(neural_network_factors, width="15", textvariable=self.neu_input_curr).grid(
             column=1,
             row=3)
 
         neu_input_intervals_label = tk.Label(neural_network_factors, text="Input Intervals (ms)").grid(column=0, row=4)
-        self.neu_input_intervals = tk.IntVar(value=500)
+        self.neu_input_intervals = tk.IntVar(value=20)
         neu_input_intervals_input = tk.Entry(neural_network_factors, width="15",
                                              textvariable=self.neu_input_intervals).grid(column=1, row=4)
 
-        sim_end_time_label = tk.Label(neural_network_factors, text="Simulation End Time (s)").grid(column=0, row=5)
-        self.sim_end_time = tk.IntVar(value=30)
+        sim_end_time_label = tk.Label(neural_network_factors, text="Simulation End Time (ms)").grid(column=0, row=5)
+        self.sim_end_time = tk.IntVar(value=500)
         sim_end_time_input = tk.Entry(neural_network_factors, width="15",
                                       textvariable=self.sim_end_time).grid(column=1, row=5)
 

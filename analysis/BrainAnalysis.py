@@ -23,7 +23,7 @@ def initialiseAndRunBrainSimulation(end_time, learning_type, input_neu_size, out
                                     mem_capacity, synaptic_strength_factor, input_interval, input_strength):
     brain = BrainSimulator(end_time, learning_type, input_neu_size, output_neu_size, mem_capacity,
                            synaptic_strength_factor)
-    brain.runSimulation(input_interval, input_strength, analysis=True)
+    brain.runSimulation(input_interval, input_strength)
     return brain
 
 

@@ -44,9 +44,9 @@ class SimulatorWindow(tk.Tk):
         else:
             aged_brain_args.append(synaptic_strength * synaptic_strength_dec_factor)
         # Neuron input current and intervals
-        normal_brain_args.append(neu_input_intervals/1000)
+        normal_brain_args.append(neu_input_intervals)
         normal_brain_args.append(neu_input_curr)
-        aged_brain_args.append(neu_input_intervals/1000)
+        aged_brain_args.append(neu_input_intervals)
         aged_brain_args.append(neu_input_curr)
 
         self.geometry("1080x720")

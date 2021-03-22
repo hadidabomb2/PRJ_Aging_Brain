@@ -38,8 +38,8 @@ class BrainFrame(tk.Frame):
         self.connections = []
         self.changed_learned_connections = []
 
-        input_neuron_list = brain.network_structure.getInputNeuronsList()
-        output_neuron_list = brain.network_structure.getOutputNeuronList()
+        input_neuron_list = brain.neural_network.getInputNeuronsList()
+        output_neuron_list = brain.neural_network.getOutputNeuronList()
         input_centering = 0
         output_centering = 0
         height_diff = ((len(input_neuron_list) - len(output_neuron_list)) * self.cellheight)
@@ -68,7 +68,7 @@ class BrainFrame(tk.Frame):
             input_neuron_coords = canvas.coords(input_neuron_canvas[1])
             x1 = input_neuron_coords[2] - ((input_neuron_coords[2] - input_neuron_coords[0]) / 2)
             y1 = input_neuron_coords[3] - ((input_neuron_coords[3] - input_neuron_coords[1]) / 2)
-            connections_list = brain.network_structure.getInputNeuronConnections(input_neuron_canvas[0])
+            connections_list = brain.neural_network.getInputNeuronConnections(input_neuron_canvas[0])
             for l, connection in enumerate(connections_list):
                 output_neuron = connection.getOutputNeuron()
                 output_neuron_id = [x[1] for x in self.output_neurons if x[0] == output_neuron][0]
