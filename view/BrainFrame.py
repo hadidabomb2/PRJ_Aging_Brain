@@ -11,13 +11,13 @@ from BrainSimulator import BrainSimulator
 
 
 class BrainFrame(tk.Frame):
-    def __init__(self, brain_args, *args, **kwargs):
+    def __init__(self, brain_args, toggleSimulations, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
         container = self
-
         # Args ordering defined in SimulatorWindow file.
         self.brain_args = brain_args
-        brain = BrainSimulator(brain_args[0], brain_args[1], brain_args[2], brain_args[3], brain_args[4], brain_args[5])
+        brain = BrainSimulator(brain_args[0], brain_args[1], brain_args[2], brain_args[3], brain_args[4], brain_args[5],
+                               brain_args[6])
         self.brain = brain
 
         canvas = tk.Canvas(container, borderwidth=0)
@@ -59,7 +59,7 @@ class BrainFrame(tk.Frame):
                                    "green", "output_neuron")
         self.displayConnectionsAsLines(canvas, brain.neural_network)
 
-        self.run_simulation = tk.Button(canvas, text="Run Simulation", command=self.runSimulationCommand)
+        self.run_simulation = tk.Button(canvas, text="Run Simulation", command=toggleSimulations)
         self.time_stamp = tk.Label(canvas, text="Time Stamp:  " + '{:.5f}'.format((round(self.brain.time, 5))))
         container.pack(side="left", fill="both", expand=True)
         canvas.pack(side="left", fill="both", expand=True)
@@ -91,7 +91,8 @@ class BrainFrame(tk.Frame):
                 self.connections.append([connection, canvas.create_line(x1, y1, x2, y2, fill="grey",
                                                                         tags="connection")])
 
-    def runSimulationCommand(self):
+    # Called by the SimulatorWindow class.
+    def toggleRunSimulation(self):
         if self.brain.running:
             self.run_simulation.config(text="Run Simulation")
             self.brain.running = False
@@ -99,10 +100,10 @@ class BrainFrame(tk.Frame):
             self.run_simulation.config(text="Stop Simulation")
             print("Simulation Started")
             if self.brain.learning_type == 'MIS':
-                self.brain.runSimulation(self.brain_args[6], self.brain_args[7], updateCanvas=self.updateCanvas,
+                self.brain.runSimulation(self.brain_args[7], updateCanvas=self.updateCanvas,
                                          updateConnections=self.updateConnections)
             else:
-                self.brain.runSimulation(self.brain_args[6], self.brain_args[7], updateCanvas=self.updateCanvas)
+                self.brain.runSimulation(self.brain_args[7], updateCanvas=self.updateCanvas)
 
         if self.brain.running:
             self.run_simulation.config(text="Run Simulation")

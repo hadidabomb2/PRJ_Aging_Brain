@@ -8,11 +8,13 @@ from tkinter import ttk
 from view.SimulatorWindow import SimulatorWindow
 
 
-class InitialisationWindow(tk.Tk):
+class MainWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.geometry("720x480")
         self.title("Learning Simulation Initialisation")
+        self.simulators = []
+
         container = ttk.Frame(self)
         container.pack(fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1, uniform="factors")
@@ -84,18 +86,30 @@ class InitialisationWindow(tk.Tk):
         tk.Checkbutton(master, variable=variable).grid(column=(column + 1), row=row)
 
     def generateYoungModel(self):
+        self.toggleSimulations(None)
         young_brain = SimulatorWindow(self.sim_end_time.get(), 0, self.no_input_neu.get(),
                                       self.no_output_neu.get(), self.mem_capacity.get(), 0,
-                                      0, self.neu_input_intervals.get(), self.neu_input_curr.get(), "Young Brain")
+                                      0, self.neu_input_intervals.get(), self.neu_input_curr.get(), "Young Brain",
+                                      toggleSimulations=self.toggleSimulations)
+        self.simulators.append(young_brain)
         young_brain.mainloop()
 
     def generateAgedModel(self):
+        self.toggleSimulations(None)
         aged_brain = SimulatorWindow(self.sim_end_time.get(), self.inhibited_LTP.get(), self.no_input_neu.get(),
                                      self.no_output_neu.get(), self.mem_capacity.get(), self.dec_synaptic_str.get(),
                                      self.inc_neurodegen.get(), self.neu_input_intervals.get(),
-                                     self.neu_input_curr.get(), "Aged Brain")
-
+                                     self.neu_input_curr.get(), "Aged Brain", toggleSimulations=self.toggleSimulations)
+        self.simulators.append(aged_brain)
         aged_brain.mainloop()
+
+    def toggleSimulations(self, target_simulator):
+        simulators = self.simulators
+        for simulator in simulators:
+            if (simulator is not target_simulator) and simulator.brain_frame.brain.running:
+                simulator.brain_frame.toggleRunSimulation()
+        if target_simulator is not None:
+            target_simulator.brain_frame.toggleRunSimulation()
 
     def exitCommand(self):
         self.destroy()

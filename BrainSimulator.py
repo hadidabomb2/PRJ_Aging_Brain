@@ -6,12 +6,15 @@ from model.NeuralNetwork import NeuralNetwork, SynapticConnection
 # and keeps track of important simulation variables to be passed to the elements in the model folder.
 class BrainSimulator:
     def __init__(self, end_time, learning_type, input_neu_size, output_neu_size, mem_capacity,
-                 synaptic_strength_factor):
+                 synaptic_strength_factor, input_interval):
         self.end_time = end_time  # The end time of the simulation (ms)
         self.time = 0  # The starting time of the simulation (ms)
         self.timestep = 0.0125  # The timestep of our simulation (ms)
+        self.no_steps = self.end_time / self.timestep  # The number of steps in the simulation
         self.learning_type = learning_type  # The learning type could be either 'LTP' or 'MIS'
         self.waiting_time = 0.0  # The time to wait before the input current can be supplied to a neuron again
+        self.input_time = input_interval  # The amount of time to supply a chosen input current
+        self.input_interval = input_interval  # The intervals at which our simulation supplies the current for
         self.neural_network = NeuralNetwork(input_neu_size, output_neu_size, mem_capacity,
                                             synaptic_strength_factor).getNeuralNetwork()
         # Important lists to keep track of learned connections, times learning has been undertaken and old connections
@@ -22,14 +25,14 @@ class BrainSimulator:
         # Boolean which determines if the simulation should keep running
         self.running = False
         # A global reference to the input neuron that is chosen at every input interval
-        self.chosen_input_neuron = None
+        connections = self.neural_network.getConnections()
+        self.chosen_input_neuron = random.choice(list(connections)).getInputNeuron()
 
-    def runSimulation(self, input_interval, input_strength, debug=False, updateCanvas=None, updateConnections=None):
+    def runSimulation(self, input_strength, debug=False, updateCanvas=None, updateConnections=None):
         # Simulation initialisation of starting variables
         timestep = self.timestep
         neural_network = self.neural_network
         connections = neural_network.getConnections()
-        waiting_time = self.waiting_time
         learned_connections = self.learned_connections
         learned_times = self.learned_times
         old_connections = self.old_connections
@@ -38,15 +41,10 @@ class BrainSimulator:
         # relevant with the learning type is 'MIS' but is defined here once because of possible compilation errors.
         adding_temp = []
         removing_temp = []
-        # The number of steps in the simulation
-        no_steps = self.end_time / timestep
-        # An input neuron is chosen by random
-        self.chosen_input_neuron = random.choice(list(connections)).getInputNeuron()
-        input_time = input_interval
 
         # Start the simulation
         self.running = True
-        for i in range(int(no_steps)):
+        for i in range(int(self.no_steps)):
             if not self.running:
                 # Stop the simulation
                 break
@@ -56,20 +54,20 @@ class BrainSimulator:
             # equal 0. This stops numbers like 0.0000000001 to not be counted as 0 when they practically are.
             # If there is waiting time, then deduct a timestep from the waiting time. Otherwise, deduct a timestep
             # from the input time.
-            if round(waiting_time, 5) > 0.0:
-                waiting_time -= timestep
+            if round(self.waiting_time, 5) > 0.0:
+                self.waiting_time -= timestep
 
                 # If the waiting time is now less or equal to 0 after the deducted timestep, that means the simulation
                 # will supply a current in the next round. In this case, randomly choose an input node to supply
                 # current to for the next round, update it's properties based off the next rounds time and update the
                 # time the input current should run for.
-                if round(waiting_time, 5) <= 0.0:
+                if round(self.waiting_time, 5) <= 0.0:
                     self.chosen_input_neuron = random.choice(list(connections)).getInputNeuron()
                     self.chosen_input_neuron.updateProperties(self.time + timestep)
-                    input_time = input_interval
+                    self.input_time = self.input_interval
 
             else:
-                input_time -= timestep
+                self.input_time -= timestep
                 # Supplying current to the chosen input neuron and recording if it has been fired or not.
                 input_fired = self.chosen_input_neuron.processInput(input_strength, self.time, timestep, debug=debug)
 
@@ -122,8 +120,8 @@ class BrainSimulator:
 
                 # If input time is now less than 0, that means the simulation should wait in the next round so the
                 # waiting_time is updated.
-                if round(input_time, 5) <= 0.0:
-                    waiting_time = input_interval
+                if round(self.input_time, 5) <= 0.0:
+                    self.waiting_time = self.input_interval
                     self.chosen_input_neuron = None
 
             # Callback to the GUI to correctly highlight learned and unlearned connections in this round.

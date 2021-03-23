@@ -9,7 +9,8 @@ from view.BrainFrame import BrainFrame
 
 class SimulatorWindow(tk.Tk):
     def __init__(self, end_time, learning_type_boolean, input_neu_size, output_neu_size, mem_capacity,
-                 dec_synaptic_strength, inc_neurodegen, neu_input_intervals, neu_input_curr, title, *args, **kwargs):
+                 dec_synaptic_strength, inc_neurodegen, neu_input_intervals, neu_input_curr, title,
+                 toggleSimulations, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.geometry("720x720")
         self.title("Learning Simulator: " + title)
@@ -53,7 +54,7 @@ class SimulatorWindow(tk.Tk):
         window_toolbar.pack(side="bottom", fill="both")
         exit_button = tk.Button(window_toolbar, text="Exit", command=self.exitCommand)
         exit_button.pack(side="left")
-        brain = BrainFrame(brain_args, self)
+        self.brain_frame = BrainFrame(brain_args, lambda: toggleSimulations(self), self)
 
     def exitCommand(self):
         self.destroy()

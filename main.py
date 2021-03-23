@@ -1,5 +1,5 @@
-from view.InitialisationWindow import InitialisationWindow
+from view.MainWindow import MainWindow
 
 if __name__ == "__main__":
-    initial_app = InitialisationWindow()
+    initial_app = MainWindow()
     initial_app.mainloop()
