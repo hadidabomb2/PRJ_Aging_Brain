@@ -5,6 +5,7 @@
 import random
 import tkinter as tk
 import time as clock
+from threading import Thread
 from tkinter import ttk
 from BrainSimulator import BrainSimulator
 
@@ -58,7 +59,7 @@ class BrainFrame(tk.Frame):
                                    "green", "output_neuron")
         self.displayConnectionsAsLines(canvas, brain.neural_network)
 
-        self.run_simulation = tk.Button(canvas, text="Run Simulation", command=self.runSimulationCommand)
+        self.run_simulation = tk.Button(canvas, text="Run Simulation", command=self.threadingRunSimulationCommand)
         self.time_stamp = tk.Label(canvas, text="Time Stamp:  " + '{:.5f}'.format((round(self.brain.time, 5))))
         container.pack(side="left", fill="both", expand=True)
         canvas.pack(side="left", fill="both", expand=True)
@@ -89,6 +90,9 @@ class BrainFrame(tk.Frame):
                 y2 = output_neuron_coords[3] - ((output_neuron_coords[3] - output_neuron_coords[1]) / 2)
                 self.connections.append([connection, canvas.create_line(x1, y1, x2, y2, fill="grey",
                                                                         tags="connection")])
+
+    def threadingRunSimulationCommand(self):
+        Thread(target=self.runSimulationCommand).start()
 
     def runSimulationCommand(self):
         if self.brain.running:

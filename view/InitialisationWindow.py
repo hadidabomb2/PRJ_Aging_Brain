@@ -34,9 +34,9 @@ class InitialisationWindow(tk.Tk):
         window_toolbar = tk.Frame(self)
         window_toolbar.pack(side="bottom", fill="both")
 
-        generate_model_btn = tk.Button(window_toolbar, text="Generate Aged Model", command=self.threadingAgedModel)
+        generate_model_btn = tk.Button(window_toolbar, text="Generate Aged Model", command=self.generateAgedModel)
         generate_model_btn.pack(side="right")
-        generate_model_btn = tk.Button(window_toolbar, text="Generate Young Model", command=self.threadingYoungModel)
+        generate_model_btn = tk.Button(window_toolbar, text="Generate Young Model", command=self.generateYoungModel)
         generate_model_btn.pack(side="right")
 
         exit_button = tk.Button(window_toolbar, text="Exit", command=self.exitCommand)
@@ -83,11 +83,11 @@ class InitialisationWindow(tk.Tk):
         tk.Label(master, text=text).grid(column=column, row=row)
         tk.Checkbutton(master, variable=variable).grid(column=(column + 1), row=row)
 
-    def threadingYoungModel(self):
-        Thread(target=self.generateYoungModel).start()
-
-    def threadingAgedModel(self):
-        Thread(target=self.generateAgedModel).start()
+    # def threadingYoungModel(self):
+    #     Thread(target=self.generateYoungModel).start()
+    #
+    # def threadingAgedModel(self):
+    #     Thread(target=self.generateAgedModel).start()
 
     def generateYoungModel(self):
         young_brain = SimulatorWindow(self.sim_end_time.get(), 0, self.no_input_neu.get(),
