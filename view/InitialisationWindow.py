@@ -83,12 +83,6 @@ class InitialisationWindow(tk.Tk):
         tk.Label(master, text=text).grid(column=column, row=row)
         tk.Checkbutton(master, variable=variable).grid(column=(column + 1), row=row)
 
-    # def threadingYoungModel(self):
-    #     Thread(target=self.generateYoungModel).start()
-    #
-    # def threadingAgedModel(self):
-    #     Thread(target=self.generateAgedModel).start()
-
     def generateYoungModel(self):
         young_brain = SimulatorWindow(self.sim_end_time.get(), 0, self.no_input_neu.get(),
                                       self.no_output_neu.get(), self.mem_capacity.get(), 0,
