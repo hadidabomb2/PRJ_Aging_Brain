@@ -3,92 +3,109 @@
 
 import random
 import tkinter as tk
+from threading import Thread
 from tkinter import ttk
 from view.SimulatorWindow import SimulatorWindow
 
 
-class InitialisationApp(tk.Tk):
+class InitialisationWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        self.geometry("1080x720")
+        self.geometry("720x480")
+        self.title("Learning Simulation Initialisation")
         container = ttk.Frame(self)
-        neural_network_factors = tk.Frame(container)
-        aged_brain_factors = tk.Frame(container)
-        neural_network_factors.config(bg="white")
-        aged_brain_factors.config(bg="black")
-
-        generate_model_btn = tk.Button(container, text="Generate Model", command=self.generateModel)
         container.pack(fill="both", expand=True)
-        generate_model_btn.pack(side="bottom")
-        neural_network_factors.pack(side="left", fill="both", expand=True)
-        aged_brain_factors.pack(side="right", fill="both", expand=True)
+        container.grid_rowconfigure(0, weight=1, uniform="factors")
+        container.grid_columnconfigure(0, weight=1, uniform="factors")
+        container.grid_columnconfigure(1, weight=1, uniform="factors")
+
+        neural_network_factors = tk.Frame(container)
+        neural_network_factors.config(bg="white")
+        neural_network_factors.grid(row=0, column=0, sticky="nsew")
+        neural_network_factors.grid_columnconfigure(0, weight=1)
+        neural_network_factors.grid_columnconfigure(3, weight=1)
+
+        aged_brain_factors = tk.Frame(container)
+        aged_brain_factors.config(bg="black")
+        aged_brain_factors.grid(row=0, column=1, sticky="nsew")
+        aged_brain_factors.grid_columnconfigure(0, weight=1)
+        aged_brain_factors.grid_columnconfigure(3, weight=1)
+
+        window_toolbar = tk.Frame(self)
+        window_toolbar.pack(side="bottom", fill="both")
+
+        generate_model_btn = tk.Button(window_toolbar, text="Generate Aged Model", command=self.threadingAgedModel)
+        generate_model_btn.pack(side="right")
+        generate_model_btn = tk.Button(window_toolbar, text="Generate Young Model", command=self.threadingYoungModel)
+        generate_model_btn.pack(side="right")
+
+        exit_button = tk.Button(window_toolbar, text="Exit", command=self.exitCommand)
+        exit_button.pack(side="left")
 
         self.neural_network_factors_title = tk.Label(neural_network_factors, text="Neuron Network Factors")
-        self.neural_network_factors_title.grid(column=0, row=0, columnspan=2)
-        # self.nnf_title.bind("<Enter>", self.nnfTitleOnEnter)
-        # self.nnf_title.bind("<Leave>", self.nnfTitleOnLeave)
+        self.neural_network_factors_title.grid(column=1, row=0, columnspan=2)
 
-        no_input_neu_label = tk.Label(neural_network_factors, text="Number of Input Neurons").grid(column=0, row=1)
         self.no_input_neu = tk.IntVar(value=10)
-        no_input_neu_input = tk.Entry(neural_network_factors, width="15", textvariable=self.no_input_neu).grid(column=1,
-                                                                                                               row=1)
+        self.makeLabelAndEntry(neural_network_factors, "Number of Input Neurons", self.no_input_neu, 1, 1)
 
-        no_output_neu_label = tk.Label(neural_network_factors, text="Number of Output Neurons").grid(column=0, row=2)
         self.no_output_neu = tk.IntVar(value=10)
-        no_output_neu_input = tk.Entry(neural_network_factors, width="15", textvariable=self.no_output_neu).grid(
-            column=1,
-            row=2)
+        self.makeLabelAndEntry(neural_network_factors, "Number of Output Neurons", self.no_output_neu, 1, 2)
 
-        neu_input_curr_label = tk.Label(neural_network_factors, text="Neuron Input Current (A)").grid(column=0, row=3)
         self.neu_input_curr = tk.IntVar(value=4)
-        neu_input_curr_input = tk.Entry(neural_network_factors, width="15", textvariable=self.neu_input_curr).grid(
-            column=1,
-            row=3)
+        self.makeLabelAndEntry(neural_network_factors, "Neuron Input Current (A)", self.neu_input_curr, 1, 3)
 
-        neu_input_intervals_label = tk.Label(neural_network_factors, text="Input Intervals (ms)").grid(column=0, row=4)
-        self.neu_input_intervals = tk.IntVar(value=20)
-        neu_input_intervals_input = tk.Entry(neural_network_factors, width="15",
-                                             textvariable=self.neu_input_intervals).grid(column=1, row=4)
+        self.neu_input_intervals = tk.IntVar(value=5)
+        self.makeLabelAndEntry(neural_network_factors, "Input Intervals (ms)", self.neu_input_intervals, 1, 4)
 
-        sim_end_time_label = tk.Label(neural_network_factors, text="Simulation End Time (ms)").grid(column=0, row=5)
         self.sim_end_time = tk.IntVar(value=500)
-        sim_end_time_input = tk.Entry(neural_network_factors, width="15",
-                                      textvariable=self.sim_end_time).grid(column=1, row=5)
+        self.makeLabelAndEntry(neural_network_factors, "Simulation End Time (ms)", self.sim_end_time, 1, 5)
 
-        mem_capacity_label = tk.Label(neural_network_factors, text="Memory Capacity (%)").grid(column=0, row=6)
         self.mem_capacity = tk.IntVar(value=100)
-        mem_capacity_input = tk.Entry(neural_network_factors, width="15", textvariable=self.mem_capacity).grid(column=1,
-                                                                                                           row=6)
+        self.makeLabelAndEntry(neural_network_factors, "Memory Capacity (%)", self.mem_capacity, 1, 6)
 
         self.aged_brain_factors_title = tk.Label(aged_brain_factors, text="Aged Brain Factors")
-        self.aged_brain_factors_title.grid(column=0, row=0, columnspan=2)
+        self.aged_brain_factors_title.grid(column=1, row=0, columnspan=2)
 
-        dec_synaptic_str_label = tk.Label(aged_brain_factors, text="Decrease Synaptic Strength").grid(column=0, row=1)
         self.dec_synaptic_str = tk.IntVar()
-        dec_synaptic_str_input = tk.Checkbutton(aged_brain_factors, variable=self.dec_synaptic_str).grid(column=1,
-                                                                                                         row=1)
+        self.makeLabelAndCheckbutton(aged_brain_factors, "Decrease Synaptic Strength", self.dec_synaptic_str, 1, 1)
 
-        inc_neurodegen_label = tk.Label(aged_brain_factors, text="Increased Neurodegeneration").grid(column=0, row=2)
         self.inc_neurodegen = tk.IntVar()
-        inc_neurodegen_input = tk.Checkbutton(aged_brain_factors, variable=self.inc_neurodegen).grid(column=1, row=2)
+        self.makeLabelAndCheckbutton(aged_brain_factors, "Increased Neurodegeneration", self.inc_neurodegen, 1, 2)
 
-        inhibited_LTP_label = tk.Label(aged_brain_factors, text="Inhibited LTP").grid(column=0, row=3)
         self.inhibited_LTP = tk.IntVar()
-        inhibited_LTP_input = tk.Checkbutton(aged_brain_factors, variable=self.inhibited_LTP).grid(column=1, row=3)
+        self.makeLabelAndCheckbutton(aged_brain_factors, "Inhibited LTP", self.inhibited_LTP, 1, 3)
 
-    # def nnfTitleOnEnter(self, event):
-    #     self.nnf_title.configure(text="Hello world")
-    #
-    # def nnfTitleOnLeave(self, enter):
-    #     self.nnf_title.configure(text="")
+    def makeLabelAndEntry(self, master, text, text_variable, column, row):
+        tk.Label(master, text=text).grid(column=column, row=row)
+        tk.Entry(master, textvariable=text_variable).grid(column=(column + 1), row=row)
 
-    def generateModel(self):
-        SimulatorWindow(self.sim_end_time.get(), self.inhibited_LTP.get(), self.no_input_neu.get(),
-                     self.no_output_neu.get(), self.mem_capacity.get(), self.dec_synaptic_str.get(),
-                     self.inc_neurodegen.get(), self.neu_input_intervals.get(), self.neu_input_curr.get())
+    def makeLabelAndCheckbutton(self, master, text, variable, column, row):
+        tk.Label(master, text=text).grid(column=column, row=row)
+        tk.Checkbutton(master, variable=variable).grid(column=(column + 1), row=row)
+
+    def threadingYoungModel(self):
+        Thread(target=self.generateYoungModel).start()
+
+    def threadingAgedModel(self):
+        Thread(target=self.generateAgedModel).start()
+
+    def generateYoungModel(self):
+        young_brain = SimulatorWindow(self.sim_end_time.get(), 0, self.no_input_neu.get(),
+                                      self.no_output_neu.get(), self.mem_capacity.get(), 0,
+                                      0, self.neu_input_intervals.get(), self.neu_input_curr.get(), "Young Brain")
+        young_brain.mainloop()
+
+    def generateAgedModel(self):
+        aged_brain = SimulatorWindow(self.sim_end_time.get(), self.inhibited_LTP.get(), self.no_input_neu.get(),
+                                     self.no_output_neu.get(), self.mem_capacity.get(), self.dec_synaptic_str.get(),
+                                     self.inc_neurodegen.get(), self.neu_input_intervals.get(),
+                                     self.neu_input_curr.get(), "Aged Brain")
+
+        aged_brain.mainloop()
+
+    def exitCommand(self):
         self.destroy()
 
-
-if __name__ == "__main__":
-    app = InitialisationApp()
-    app.mainloop()
+# if __name__ == "__main__":
+#     app = InitialisationWindow()
+#     app.mainloop()

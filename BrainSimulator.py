@@ -19,11 +19,14 @@ class BrainSimulator:
         self.learned_connections = []
         self.learned_times = []
         self.old_connections = []
+        # Boolean which determines if the simulation should keep running
+        self.running = False
+        # A global reference to the input neuron that is chosen at every input interval
+        self.chosen_input_neuron = None
 
     def runSimulation(self, input_interval, input_strength, debug=False, updateCanvas=None, updateConnections=None):
         # Simulation initialisation of starting variables
         timestep = self.timestep
-        time = self.time
         neural_network = self.neural_network
         connections = neural_network.getConnections()
         waiting_time = self.waiting_time
@@ -35,12 +38,20 @@ class BrainSimulator:
         # relevant with the learning type is 'MIS' but is defined here once because of possible compilation errors.
         adding_temp = []
         removing_temp = []
-        no_steps = self.end_time / timestep  # The number of steps in the simulation
-        chosen_input_neuron = random.choice(list(connections)).getInputNeuron()  # An input neuron is chosen by random
+        # The number of steps in the simulation
+        no_steps = self.end_time / timestep
+        # An input neuron is chosen by random
+        self.chosen_input_neuron = random.choice(list(connections)).getInputNeuron()
         input_time = input_interval
 
+        # Start the simulation
+        self.running = True
         for i in range(int(no_steps)):
-            time += timestep
+            if not self.running:
+                # Stop the simulation
+                break
+
+            self.time += timestep
             # It is rounded to 5 decimal places because floats can become infinitely closer to 0 and not actually
             # equal 0. This stops numbers like 0.0000000001 to not be counted as 0 when they practically are.
             # If there is waiting time, then deduct a timestep from the waiting time. Otherwise, deduct a timestep
@@ -53,20 +64,20 @@ class BrainSimulator:
                 # current to for the next round, update it's properties based off the next rounds time and update the
                 # time the input current should run for.
                 if round(waiting_time, 5) <= 0.0:
-                    chosen_input_neuron = random.choice(list(connections)).getInputNeuron()
-                    chosen_input_neuron.updateProperties(time + timestep)
+                    self.chosen_input_neuron = random.choice(list(connections)).getInputNeuron()
+                    self.chosen_input_neuron.updateProperties(self.time + timestep)
                     input_time = input_interval
 
             else:
                 input_time -= timestep
                 # Supplying current to the chosen input neuron and recording if it has been fired or not.
-                input_fired = chosen_input_neuron.processInput(input_strength, time, timestep, debug=debug)
+                input_fired = self.chosen_input_neuron.processInput(input_strength, self.time, timestep, debug=debug)
 
                 # If it has been fired, then cycle through the output neurons that have a connection with
                 # the fired input neuron, update their properties and supply a current to them based off their
                 # respective connection strengths.
                 if input_fired:
-                    input_connections = neural_network.getInputNeuronConnections(chosen_input_neuron)
+                    input_connections = neural_network.getInputNeuronConnections(self.chosen_input_neuron)
                     for j in range(len(input_connections)):
                         input_connection = input_connections[j]
                         # If the current connection that is being processed is already a learned connection or an
@@ -76,10 +87,10 @@ class BrainSimulator:
                         # gets removed and does not exist anymore.
                         if not ((input_connection in learned_connections) or (input_connection in old_connections)):
                             output_neuron = input_connection.getOutputNeuron()
-                            output_neuron.updateProperties(time)
+                            output_neuron.updateProperties(self.time)
                             connection_strength = input_connection.getConnectionStrength()
                             # Record if output neuron has been fired.
-                            output_fired = output_neuron.processInput(connection_strength, time, timestep)
+                            output_fired = output_neuron.processInput(connection_strength, self.time, timestep)
                             if output_fired:
                                 if learning_type == 'MIS':
                                     # Total LTP inhibition is almost never the case, normally, MIS just becomes more
@@ -88,10 +99,10 @@ class BrainSimulator:
                                     # impact of MIS and minimize the magnitude of randomness and variance in our
                                     # results, we made it so it always triggers if the learning type is 'MIS'.
                                     self.triggerMIS(input_connection, learned_connections, input_connections,
-                                                    time, learned_times, old_connections, adding_temp,
+                                                    self.time, learned_times, old_connections, adding_temp,
                                                     removing_temp)
                                 else:
-                                    self.triggerLTP(input_connection, learned_connections, time, learned_times)
+                                    self.triggerLTP(input_connection, learned_connections, self.time, learned_times)
 
                     # Because editing the list of input connections while iterating through it is a bad practice
                     # that can lead to many bugs, we are adding and removing all the connections that need to be added
@@ -113,6 +124,7 @@ class BrainSimulator:
                 # waiting_time is updated.
                 if round(input_time, 5) <= 0.0:
                     waiting_time = input_interval
+                    self.chosen_input_neuron = None
 
             # Callback to the GUI to correctly highlight learned and unlearned connections in this round.
             if updateCanvas is not None:

@@ -9,50 +9,54 @@ from view.BrainFrame import BrainFrame
 
 class SimulatorWindow(tk.Tk):
     def __init__(self, end_time, learning_type_boolean, input_neu_size, output_neu_size, mem_capacity,
-                 dec_synaptic_strength, inc_neurodegen, neu_input_intervals, neu_input_curr, *args, **kwargs):
+                 dec_synaptic_strength, inc_neurodegen, neu_input_intervals, neu_input_curr, title, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        normal_brain_args = []
-        aged_brain_args = []
+        self.geometry("720x720")
+        self.title("Learning Simulator: " + title)
+
+        brain_args = []
+
         # End time
-        normal_brain_args.append(end_time)
-        aged_brain_args.append(end_time)
+        brain_args.append(end_time)
+
         # Learning types
-        normal_brain_args.append('LTP')
         if learning_type_boolean == 0:
-            aged_brain_args.append('LTP')
+            brain_args.append('LTP')
         else:
-            aged_brain_args.append('MIS')
+            brain_args.append('MIS')
+
         # Number of input and output neurons
-        normal_brain_args.append(input_neu_size)
-        normal_brain_args.append(output_neu_size)
         neu_dec_factor = 0.8
         if inc_neurodegen == 0:
-            aged_brain_args.append(int(input_neu_size))
-            aged_brain_args.append(int(output_neu_size))
+            brain_args.append(int(input_neu_size))
+            brain_args.append(int(output_neu_size))
         else:
-            aged_brain_args.append(int(input_neu_size * neu_dec_factor))
-            aged_brain_args.append(int(output_neu_size * neu_dec_factor))
+            brain_args.append(int(input_neu_size * neu_dec_factor))
+            brain_args.append(int(output_neu_size * neu_dec_factor))
+
         # Memory Capacity
-        normal_brain_args.append(mem_capacity / 100)
-        aged_brain_args.append(mem_capacity / 100)
+        brain_args.append(mem_capacity / 100)
+
         # Synaptic Strength
         synaptic_strength = 6
         synaptic_strength_dec_factor = 0.6
-        normal_brain_args.append(synaptic_strength)
         if dec_synaptic_strength == 0:
-            aged_brain_args.append(synaptic_strength)
+            brain_args.append(synaptic_strength)
         else:
-            aged_brain_args.append(synaptic_strength * synaptic_strength_dec_factor)
+            brain_args.append(synaptic_strength * synaptic_strength_dec_factor)
+
         # Neuron input current and intervals
-        normal_brain_args.append(neu_input_intervals)
-        normal_brain_args.append(neu_input_curr)
-        aged_brain_args.append(neu_input_intervals)
-        aged_brain_args.append(neu_input_curr)
+        brain_args.append(neu_input_intervals)
+        brain_args.append(neu_input_curr)
 
-        self.geometry("1080x720")
+        window_toolbar = tk.Frame(self)
+        window_toolbar.pack(side="bottom", fill="both")
+        exit_button = tk.Button(window_toolbar, text="Exit", command=self.exitCommand)
+        exit_button.pack(side="left")
+        brain = BrainFrame(brain_args, self)
 
-        normal_brain = BrainFrame(normal_brain_args, self)
-        aged_brain = BrainFrame(aged_brain_args, self)
+    def exitCommand(self):
+        self.destroy()
 
 # if __name__ == "__main__":
 #     app = SimulatorWindow()
