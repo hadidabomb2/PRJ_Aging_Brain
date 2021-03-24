@@ -11,7 +11,9 @@ from view.SimulatorWindow import SimulatorWindow
 class MainWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        self.geometry("720x480")
+        x = self.winfo_screenwidth() / 3.25  # width of the screen / 3.25
+        y = self.winfo_screenheight() / 4  # height of the screen / 4
+        self.geometry('%dx%d+%d+%d' % (720, 480, x, y))
         self.title("Learning Simulation Initialisation")
         self.simulators = []
 

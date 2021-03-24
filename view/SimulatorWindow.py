@@ -12,7 +12,12 @@ class SimulatorWindow(tk.Tk):
                  dec_synaptic_strength, inc_neurodegen, neu_input_intervals, neu_input_curr, title,
                  toggleSimulations, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        self.geometry("720x720")
+        x = self.winfo_screenwidth() / 8  # width of the screen / 8
+        # Place the window more on the right if it is an Aged Brain
+        if title == "Aged Brain":
+            x = self.winfo_screenwidth() / 2
+        y = self.winfo_screenheight() / 6  # height of the screen / 6
+        self.geometry('%dx%d+%d+%d' % (720, 720, x, y))
         self.title("Learning Simulator: " + title)
 
         brain_args = []
