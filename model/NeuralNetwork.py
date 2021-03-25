@@ -58,8 +58,6 @@ class NeuralNetworkDataStructure:
         return self.connections
 
 
-
-
 # The neural network that represents a neural network using the data structure defined above and further logic.
 class NeuralNetwork:
     def __init__(self, input_neu_size, output_neu_size, mem_capacity, synaptic_strength_factor):

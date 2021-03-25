@@ -188,10 +188,14 @@ def comparingMembranePotentialBasic(end_time, learning_type, input_neu_size, syn
     plt.show()
 
 
-if __name__ == '__main__':
+def main():
     comparingLearningMechanismBasic(200, 50, 50, 5, .025, 5)
-    comparingLearningMechanismBasic(20000, 500, 500, 5, .025, 5)
-    # comparingSynapticStrengthBasic(300, 'LTP', 50, 50, .025, 5)
-    # comparingNeuronAmountBasic(200, 'LTP', 5, .025, 5)
-    # comparingMembranePotentialBasic(500, 'LTP', 30, 5, 1, 5)
-    print("Ended")
+    comparingSynapticStrengthBasic(300, 'LTP', 50, 50, .025, 5)
+    comparingNeuronAmountBasic(200, 'LTP', 5, .025, 5)
+    comparingMembranePotentialBasic(500, 'LTP', 30, 5, 1, 5)
+
+
+if __name__ == '__main__':
+    print("Running analysis, please wait...")
+    main()
+    print("Analysis has finished.")
