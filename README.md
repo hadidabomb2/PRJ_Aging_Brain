@@ -99,7 +99,80 @@ Now you're ready to run the app! Please go to the Running section to see how to 
     ```
 Now you're ready to run the app! Please go to the Running section to see how to proceed.
 ### For Windows
+* Install the latest version of Python 3 - below is a quick summary taken from the 
+  website: https://phoenixnap.com/kb/how-to-install-python-3-windows
+  * Download the appropriate latest installer from https://www.python.org/downloads/windows/
+  * Run the executable installer \
+  Note: Make sure you select  Install launcher for all users and Add Python 3.7 to PATH checkboxes. The latter 
+    places the interpreter in the execution path. For all recent versions of Python, the recommended installation
+    options include Pip and IDLE.
 
+* Now install the following modules using pip:
+    * numpy
+    * pandas
+    * matplotlib
+    * nuitka
 
-https://pypi.org/project/Nuitka/ \
-https://nuitka.net/doc/user-manual.html#id3
+    These can be installed by opening Command Prompt and using the following command:
+    ```bash
+    C:\Users\Username> python -m pip install *InsertPackageNameHere*
+    ```
+  Example: To install pandas you would type
+    ```bash
+    C:\Users\Username> python -m pip install pandas
+    ```
+Now you're ready to run the app!
+
+## Running
+
+### For Mac OS / Mac OS X / Linux
+* First navigate to this project folder where this README file is located using the terminal.
+* Run the following command:
+```bash
+$ python3 -m nuitka main.py
+```
+This will generate optimised source code for a C backend complier.
+* Finally run the last command:
+```bash
+$ ./main.bin
+```
+To run the application or run
+```bash
+$ ./main.bin -analysis
+```
+To run the BrainAnalysis.py file located in the analysis folder which provides only the analysis.
+
+Note: You can also run the command:
+```bash
+$ python3 main.py
+```
+To run the application but using the nuitka code generator is heavily recommended especially if you are on
+Mac OS / Mac OS X as the simulation will run quite slowly otherwise.
+
+### For Windows
+* First navigate to this project folder where this README file is located using the Windows PowerShell.
+* Run the following command:
+```bash
+$ python -m nuitka --mingw64 main.py
+```
+This will generate optimised source code for a MinGW64 based C compiler.
+* Finally run the last command:
+```bash
+$ main.exe
+```
+To run the application or run
+```bash
+$ main.exe -analysis
+```
+To run the BrainAnalysis.py file located in the analysis folder which provides only the analysis.
+
+Note: You can also run the command:
+```bash
+$ python main.py
+```
+To run the application but using the nuitka code generator is heavily recommended as the simulation will run 
+quite slowly otherwise.
+
+#### For more details on Nuitka, follow the following links:
+* https://pypi.org/project/Nuitka/
+* https://nuitka.net/doc/user-manual.html#id3

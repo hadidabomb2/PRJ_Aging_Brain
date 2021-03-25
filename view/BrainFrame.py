@@ -8,7 +8,6 @@ import time as clock
 from tkinter import ttk
 from BrainSimulator import BrainSimulator
 
-
 # This class is inherits from a tk.Frame object and is responsible for displaying and running the main neural network
 # in this simulation
 class BrainFrame(ttk.Frame):
@@ -69,19 +68,28 @@ class BrainFrame(ttk.Frame):
         elif height_diff < 0:
             input_centering = abs(height_diff / 2)
 
+        # Holds the colours that each type of neuron state correlates to.
+        canvas_colours = {"input_neuron": "blue", "output_neuron": "green", "supplied_neuron": "orange red",
+                          "fired_neuron": "red"}
+        self.canvas_colours = canvas_colours
+
         # The oval spacing defines how vertically spaced out each neuron is in each column.
         oval_spacing = 7
         # Display the neurons and connections.
         self.displayNeuronsAsOvals(self.input_neurons, brain_input_neurons, oval_spacing, 1, canvas, input_centering,
-                                   "blue", "input_neuron")
+                                   canvas_colours["input_neuron"], "input_neuron")
         self.displayNeuronsAsOvals(self.output_neurons, brain_output_neurons, oval_spacing, 10, canvas,
                                    output_centering,
-                                   "green", "output_neuron")
+                                   canvas_colours["output_neuron"], "output_neuron")
         self.displayConnectionsAsLines(self.input_neurons, self.output_neurons, self.connections, canvas,
                                        brain.neural_network)
 
+        # Draw the legend that displays which colours mean what.
+        self.drawCanvasLegend(canvas, canvas_colours)
+
         # Run simulation button which makes the callback to the MainWindow to call the toggleSimulations function.
-        self.run_simulation = ttk.Button(canvas, style='RunSimulation.TButton', text="Run Simulation", command=toggleSimulations)
+        self.run_simulation = ttk.Button(canvas, style='RunSimulation.TButton', text="Run Simulation",
+                                         command=toggleSimulations)
         # A time stamp telling the user the current time of the simulation.
         self.time_stamp = ttk.Label(canvas, style='Timestamp.TLabel', text=self.getTimeStampText())
         container.pack(side="left", fill="both", expand=True)
@@ -98,7 +106,7 @@ class BrainFrame(ttk.Frame):
         for i, neuron in enumerate(neuron_list_brain):
             # Added margins to position the column of neurons appropriately in the window
             x_margin = 110
-            y_margin = 40
+            y_margin = 100
             # The horizontal shift controls how far the column should be shifted in the x-axis.
             x1 = (self.neuron_width * horizontal_shift) + x_margin
             x2 = x1 + self.neuron_width
@@ -207,10 +215,10 @@ class BrainFrame(ttk.Frame):
 
         # Reset all neuron colours.
         for input_neuron in input_neurons:
-            canvas.itemconfig(input_neuron[1], fill="blue")
+            canvas.itemconfig(input_neuron[1], fill=self.canvas_colours["input_neuron"])
         output_neurons = self.output_neurons
         for output_neuron in output_neurons:
-            canvas.itemconfig(output_neuron[1], fill="green")
+            canvas.itemconfig(output_neuron[1], fill=self.canvas_colours["output_neuron"])
 
         # Get the connections that got added to the learned_connections list at the current timestamp. They are the
         # unchanged connections we need to highlight as they are currently undergoing learning according to our
@@ -220,7 +228,7 @@ class BrainFrame(ttk.Frame):
         # Highlight the neuron that is being current is being supplied to.
         if chosen_input_neuron:
             chosen_input_neuron_id = [x[1] for x in input_neurons if x[0] == chosen_input_neuron][0]
-            canvas.itemconfig(chosen_input_neuron_id, fill="orange red")
+            canvas.itemconfig(chosen_input_neuron_id, fill=self.canvas_colours["supplied_neuron"])
 
         # Highlight all the connections in the unchanged_learned_connections list and append the connection to the
         # changed_learned_connections list.
@@ -228,9 +236,10 @@ class BrainFrame(ttk.Frame):
             output_neuron_id = [x[1] for x in output_neurons if x[0] == learned_connection.getOutputNeuron()][0]
             input_neuron_id = [x[1] for x in input_neurons if x[0] == learned_connection.getInputNeuron()][0]
             connection_id = [x[1] for x in connections if x[0] == learned_connection][0]
-            canvas.itemconfig(output_neuron_id, fill="red")
-            canvas.itemconfig(input_neuron_id, fill="red")
-            canvas.itemconfig(connection_id, fill="red", width=2)
+            fill = self.canvas_colours["fired_neuron"]
+            canvas.itemconfig(output_neuron_id, fill=fill)
+            canvas.itemconfig(input_neuron_id, fill=fill)
+            canvas.itemconfig(connection_id, fill=fill, width=2)
             changed_learned_connections.append(learned_connection)
         # Update GUI
         self.update()
@@ -244,3 +253,35 @@ class BrainFrame(ttk.Frame):
     # to 5 decimal places.
     def getTimeStampText(self):
         return "Time Stamp: " + '{:.5f}'.format((round(self.brain.time, 5))) + ' ms'
+
+    # Draws the legend on the canvas. Since lengths of labels are all varied, it was easier to manually transform the
+    # coordinates on the x-axis with the help of the transformXCoordsLegend(...) helper function below. Technically,
+    # it might be possible to get the pixel size of the each text letter use an algorithm to nicely space it out,
+    # however, there is a lot of unnecessary added complexity that way.
+    def drawCanvasLegend(self, canvas, canvas_colours):
+        xCoords = [80, 90, 140]
+        y1 = 70
+        y2 = y1 + 10
+        y3 = y2 - 5
+
+        # For input neurons
+        canvas.create_rectangle(xCoords[0], y1, xCoords[1], y2, fill=canvas_colours["input_neuron"])
+        canvas.create_text(xCoords[2], y3, text="Input Neurons")
+        # For output neurons
+        self.transformXCoordsLegend(xCoords, 60, 10, 55)
+        canvas.create_rectangle(xCoords[0], y1, xCoords[1], y2, fill=canvas_colours["output_neuron"])
+        canvas.create_text(xCoords[2], y3, text="Output Neurons")
+        # For the input neuron that an input current is being supplied to
+        self.transformXCoordsLegend(xCoords, 60, 10, 90)
+        canvas.create_rectangle(xCoords[0], y1, xCoords[1], y2, fill=canvas_colours["supplied_neuron"])
+        canvas.create_text(xCoords[2], y3, text="Current Supplied to Neuron")
+        # For the neuron that is fired when the membrane potential exceeds the membrane threshold
+        self.transformXCoordsLegend(xCoords, 100, 10, 60)
+        canvas.create_rectangle(xCoords[0], y1, xCoords[1], y2, fill=canvas_colours["fired_neuron"])
+        canvas.create_text(xCoords[2], y3, text="Connections Fired")
+
+    # Helper function for drawCanvasLegend(...) for simple coordinate shifting.
+    def transformXCoordsLegend(self, coords, t1, t2, t3):
+        coords[0] = coords[2] + t1
+        coords[1] = coords[0] + t2
+        coords[2] = coords[1] + t3
