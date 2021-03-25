@@ -98,26 +98,33 @@ class SimulatorWindow(tk.Tk):
         self.destroy()
         print("Simulation Closed")
 
+    # Displays the properties page of the simulation
     def viewProperties(self, brain_args):
+        # Plotting the total number of output neurons spiked by the time lapsed.
         brain = [self.brain_frame.brain]
-        df_1 = getDataFrameLists(brain, "learned_times", getDataFrameGroupedByTimeAndMaximised)
+        df = getDataFrameLists(brain, "learned_times", getDataFrameGroupedByTimeAndMaximised)
         fig = plt.figure(figsize=(15, 7))
-        text = self.getModelParametersAsText(brain_args)
-        plt.figtext(0.5, 0.01, text, horizontalalignment='center', wrap=True, fontsize=12)
+        # Display the model parameters on the right hand side of the graph.
+        plt.figtext(0.80, 0.83, "Model Parameters:", horizontalalignment='left', wrap=True, fontsize=15)
+        plt.figtext(0.80, 0.53, self.getModelParametersAsString(brain_args), horizontalalignment='left', wrap=True,
+                    fontsize=12)
         plt.suptitle("Analysing Learning Times w/ " + self.title_text, fontsize=20)
-        plt.plot(df_1[0]['Time'], df_1[0]['No_Spiked'], linewidth=3)
+        plt.plot(df[0]['Time'], df[0]['No_Spiked'], linewidth=3)
         plt.xlabel("Time (ms)")
         plt.ylabel("No. of Output Nodes Spiked")
-        fig.subplots_adjust(bottom=0.15)
+        # Add space on the right side for the model parameters to fit.
+        fig.subplots_adjust(right=0.75)
+        # Show the graph with the properties on the right hand side.
         plt.show()
 
-    def getModelParametersAsText(self, brain_args):
-        text = "Simulation End Time (ms): " + str(brain_args[0]) + " | " + \
-               "Learning Type: " + str(brain_args[1]) + " | " + \
-               "No. of Input Neurons: " + str(brain_args[2]) + " | " + \
-               "No. of Output Neurons: " + str(brain_args[3]) + " | " + \
-               "Memory Capacity (%): " + str(brain_args[4] * 100) + " | " + \
-               "Synaptic Strength: " + str(brain_args[5]) + " | " + \
-               "Input Intervals (ms): " + str(brain_args[6]) + " | " + \
+    # Returns the model parameters as a string with appropriate formatting.
+    def getModelParametersAsString(self, brain_args):
+        text = "Simulation End Time (ms): " + str(brain_args[0]) + "\n" + \
+               "Learning Type: " + str(brain_args[1]) + "\n" + \
+               "No. of Input Neurons: " + str(brain_args[2]) + "\n" + \
+               "No. of Output Neurons: " + str(brain_args[3]) + "\n" + \
+               "Memory Capacity (%): " + str(brain_args[4] * 100) + "\n" + \
+               "Synaptic Strength: " + str(brain_args[5]) + "\n" + \
+               "Input Intervals (ms): " + str(brain_args[6]) + "\n" + \
                "Neuron Input Current (A): " + str(brain_args[7])
         return text
