@@ -6,11 +6,12 @@ import random
 import tkinter as tk
 import time as clock
 from tkinter import ttk
-from BrainSimulator import BrainSimulator
+from model.LearningSimulator import LearningSimulator
+
 
 # This class is inherits from a tk.Frame object and is responsible for displaying and running the main neural network
 # in this simulation
-class BrainFrame(ttk.Frame):
+class NeuralNetworkFrame(ttk.Frame):
     def __init__(self, brain_args, toggleSimulations, *args, **kwargs):
         ttk.Frame.__init__(self, *args, **kwargs)
 
@@ -18,8 +19,8 @@ class BrainFrame(ttk.Frame):
         container = self
         # Args ordering defined in SimulatorWindow file.
         self.brain_args = brain_args
-        brain = BrainSimulator(brain_args[0], brain_args[1], brain_args[2], brain_args[3], brain_args[4], brain_args[5],
-                               brain_args[6])
+        brain = LearningSimulator(brain_args[0], brain_args[1], brain_args[2], brain_args[3], brain_args[4], brain_args[5],
+                                  brain_args[6])
         self.brain = brain
 
         # The canvas that holds the neuron and connection representations. When the 'Run Simulation' button is pressed,
@@ -139,8 +140,8 @@ class BrainFrame(ttk.Frame):
                 connections.append([connection, canvas.create_line(x1, y1, x2, y2, fill="grey",
                                                                    tags="connection")])
 
-    # Called by the MainWindow class. It stops the simulation by setting the running variable in the BrainSimulator to
-    # False and starts it again by calling the runSimulation(...) method in the BrainSimulator.
+    # Called by the MainWindow class. It stops the simulation by setting the running variable in the LearningSimulator to
+    # False and starts it again by calling the runSimulation(...) method in the LearningSimulator.
     def toggleRunSimulation(self):
         if self.brain.running:
             self.brain.running = False
@@ -161,7 +162,9 @@ class BrainFrame(ttk.Frame):
         # Once the simulation is over, set the running value to False and update the GUI again.
         if self.brain.running:
             self.brain.running = False
-            self.run_simulation.config(text="Run Simulation")
+            self.run_simulation.config(text="Simulation Has Ended, Run Another Iteration?")
+            # Resetting the number of simulation steps to allow running for more iterations.
+            self.brain.resetNoOfSteps()
             print("Simulation Ended")
 
     # This method removes an old connection and adds a new connection to the GUI. Only happens during MIS and if it

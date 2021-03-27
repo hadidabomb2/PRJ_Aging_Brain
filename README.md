@@ -101,11 +101,11 @@ Now you're ready to run the app! Please go to the Running section to see how to 
 ### For Windows
 * Install the latest version of Python 3 - below is a quick summary taken from the 
   website: https://phoenixnap.com/kb/how-to-install-python-3-windows
-  * Download the appropriate latest installer from https://www.python.org/downloads/windows/
+  * Download the appropriate latest Windows installer from https://www.python.org/downloads/windows/
   * Run the executable installer \
-  Note: Make sure you select  Install launcher for all users and Add Python 3.7 to PATH checkboxes. The latter 
+  Note: Make sure you select  Install launcher for all users and Add Python 3.7+ to PATH checkboxes. The latter 
     places the interpreter in the execution path. For all recent versions of Python, the recommended installation
-    options include Pip and IDLE.
+    options include Pip and IDLE so no need for specifying a custom installation in the setup application.
 
 * Now install the following modules using pip:
     * numpy
@@ -150,10 +150,10 @@ To run the application but using the nuitka code generator is heavily recommende
 Mac OS / Mac OS X as the simulation will run quite slowly otherwise.
 
 ### For Windows
-* First navigate to this project folder where this README file is located using the Windows PowerShell.
+* First navigate to this project folder where this README file is located using the Windows Command Prompt.
 * Run the following command:
 ```bash
-$ python -m nuitka --mingw64 main.py
+$ python -m nuitka main.py
 ```
 This will generate optimised source code for a MinGW64 based C compiler.
 * Finally run the last command:
@@ -172,6 +172,10 @@ $ python main.py
 ```
 To run the application but using the nuitka code generator is heavily recommended as the simulation will run 
 quite slowly otherwise.
+
+## Recommended Requirements
+###Operating System
+Linux Distributions such as Ubuntu 20.04 are the most recommended operating system to use
 
 #### For more details on Nuitka, follow the following links:
 * https://pypi.org/project/Nuitka/

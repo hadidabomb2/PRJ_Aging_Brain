@@ -6,11 +6,11 @@ import tkinter as tk
 from tkinter import ttk
 
 from analysis.BrainAnalysis import getDataFrameLists, getDataFrameGroupedByTimeAndMaximised
-from view.BrainFrame import BrainFrame
+from view.NeuralNetworkFrame import NeuralNetworkFrame
 import matplotlib.pyplot as plt
 
 
-# The simulator window that parses in the data received from the MainWindow, initialises the BrainFrame class with
+# The simulator window that parses in the data received from the MainWindow, initialises the NeuralNetworkFrame class with
 # the appropriate arguments and deals with other window logic.
 class SimulatorWindow(tk.Tk):
     def __init__(self, end_time, learning_type_boolean, input_neu_size, output_neu_size, mem_capacity,
@@ -29,20 +29,32 @@ class SimulatorWindow(tk.Tk):
         # the exit button.
         self.protocol("WM_DELETE_WINDOW", lambda: self.exitCommand(removeSimulator))
 
-        x = self.winfo_screenwidth() / 8  # width of the screen / 8
-        # Place the window more on the right if it is an Aged Brain.
-        if title == "Aged Brain":
-            x = self.winfo_screenwidth() / 2
-        y = self.winfo_screenheight() / 6  # height of the screen / 6
-        self.geometry('%dx%d+%d+%d' % (720, 720, x, y))
+        width = 720
+        height = 720
+        x = (self.winfo_screenwidth() / 2)
+        # Place the window more on the left if it is a Young Brain.
+        if title == "Young Brain":
+            x = (self.winfo_screenwidth() / 2) - width
+        y = (self.winfo_screenheight() / 2) - (height / 2)
+        self.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
         # Set the title of the window.
         self.title("Learning Simulator: " + title)
         self.title_text = title
 
-        # This holds all the arguments that need to be passed to the BrainFrame in a certain order. The first element
-        # is the end_time.
-        brain_args = [end_time]
+        window_toolbar = ttk.Frame(self)
+        window_toolbar.pack(side="bottom", fill="both")
+        # Button to close the window.
+        exit_button = ttk.Button(window_toolbar, style='Exit.TButton', text="Exit",
+                                 command=lambda: self.exitCommand(removeSimulator))
+        exit_button.pack(side="left")
+        properties_button = ttk.Button(window_toolbar, style='RunSimulation.TButton', text="View Properties",
+                                       command=lambda: self.viewProperties(brain_args))
+        properties_button.pack(side="right")
+
+        # This holds all the arguments that need to be passed to the NeuralNetworkFrame in a certain order. The first
+        # element is the end_time.
+        brain_args = [float(end_time)]
 
         # Learning types
         if learning_type_boolean == 0:  # If 'Inhibited LTP' was selected or not
@@ -60,34 +72,25 @@ class SimulatorWindow(tk.Tk):
             brain_args.append(int(output_neu_size * neu_dec_factor))
 
         # Memory Capacity
-        brain_args.append(mem_capacity / 100)
+        brain_args.append(float(mem_capacity) / 100)
 
         # Synaptic Strength
         synaptic_strength_dec_factor = 0.6
         if dec_synaptic_strength == 0:  # If 'Decreased Synaptic Stength' was selected or not
-            brain_args.append(int(synaptic_strength))
+            brain_args.append(float(synaptic_strength))
         else:
-            brain_args.append(int(synaptic_strength * synaptic_strength_dec_factor))
+            brain_args.append(float(synaptic_strength) * synaptic_strength_dec_factor)
 
         # Neuron input current and intervals
-        brain_args.append(neu_input_intervals)
-        brain_args.append(neu_input_curr)
+        brain_args.append(float(neu_input_intervals))
+        brain_args.append(float(neu_input_curr))
 
-        window_toolbar = ttk.Frame(self)
-        window_toolbar.pack(side="bottom", fill="both")
-        # Button to close the window.
-        exit_button = ttk.Button(window_toolbar, style='Exit.TButton', text="Exit",
-                                 command=lambda: self.exitCommand(removeSimulator))
-        exit_button.pack(side="left")
-        properties_button = ttk.Button(window_toolbar, style='RunSimulation.TButton', text="View Properties",
-                                       command=lambda: self.viewProperties(brain_args))
-        properties_button.pack(side="right")
         # Create frame that will display the neural network.
-        self.brain_frame = BrainFrame(brain_args, lambda: toggleSimulations(self), self)
+        self.brain_frame = NeuralNetworkFrame(brain_args, lambda: toggleSimulations(self), self)
 
     # Closes the window safely. Setting the self.brain_frame.brain.running to False stops the simulation in the backend.
     # Errors in tinker callbacks are raised if the backend is running but the SimulationWindow has been closed, callback
-    # in the BrainSimulator.runSimulation(...) method leads to nothing. The removeSimulator callback leads to the
+    # in the LearningSimulator.runSimulation(...) method leads to nothing. The removeSimulator callback leads to the
     # MainWindow class.
     def exitCommand(self, removeSimulator):
         if self.brain_frame.brain.running:

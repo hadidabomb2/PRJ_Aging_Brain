@@ -4,7 +4,7 @@ from model.NeuralNetwork import NeuralNetwork, SynapticConnection
 
 # This class is responsible for running the simulation. It consists of majority of the logic that runs the simulation
 # and keeps track of important simulation variables to be passed to the elements in the model folder.
-class BrainSimulator:
+class LearningSimulator:
     def __init__(self, end_time, learning_type, input_neu_size, output_neu_size, mem_capacity,
                  synaptic_strength_factor, input_interval):
         self.end_time = end_time  # The end time of the simulation (ms)
@@ -38,17 +38,19 @@ class BrainSimulator:
         old_connections = self.old_connections
         learning_type = self.learning_type
         # Create temporary lists that hold which neurons have to be added or removed. This is only
-        # relevant with the learning type is 'MIS' but is defined here once because of possible compilation errors.
+        # relevant with the learning type is 'MIS' but is defined here once because of possible referencing or
+        # scoping issues.
         adding_temp = []
         removing_temp = []
 
         # Start the simulation
         self.running = True
-        for i in range(int(self.no_steps)):
+        while int(self.no_steps) > 0:
             if not self.running:
                 # Stop the simulation
                 break
 
+            self.no_steps = self.no_steps - 1
             self.time += timestep
             # It is rounded to 5 decimal places because floats can become infinitely closer to 0 and not actually
             # equal 0. This stops numbers like 0.0000000001 to not be counted as 0 when they practically are.
@@ -95,7 +97,8 @@ class BrainSimulator:
                                     # common. Therefore, it would be more accurate to trigger MIS based of a random
                                     # probability instead of always triggering MIS. However, just to stress on the
                                     # impact of MIS and minimize the magnitude of randomness and variance in our
-                                    # results, we made it so it always triggers if the learning type is 'MIS'.
+                                    # results, we made it so it always triggers if the learning type is 'MIS' at this
+                                    # stage.
                                     self.triggerMIS(input_connection, learned_connections, input_connections,
                                                     self.time, learned_times, old_connections, adding_temp,
                                                     removing_temp)
@@ -103,8 +106,8 @@ class BrainSimulator:
                                     self.triggerLTP(input_connection, learned_connections, self.time, learned_times)
 
                     # Because editing the list of input connections while iterating through it is a bad practice
-                    # that can lead to many bugs, we are adding and removing all the connections that need to be added
-                    # and removed from the network after the loop ends.
+                    # that can lead to many bugs, so we are adding and removing all the connections that need to be
+                    # added and removed from the network after the loop ends.
                     if learning_type == "MIS":
                         for k in range(len(adding_temp)):
                             new_connection = adding_temp[k]
@@ -170,3 +173,7 @@ class BrainSimulator:
             learned_connections.append(new_connection)
             learned_connections.append(input_connection)
             learned_times.append(time)
+
+    # Reinitialise the number of simulation steps to allow running for more iterations.
+    def resetNoOfSteps(self):
+        self.no_steps = self.end_time / self.timestep

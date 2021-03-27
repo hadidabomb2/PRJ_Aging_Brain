@@ -14,7 +14,7 @@ import math
 
 class Neuron:
     def __init__(self):
-        self.tau_ref = random.uniform(3, 4)  # Average neuronal refractory period (ms)
+        self.tau_ref = random.uniform(.5, 1)  # Average neuronal refractory period (ms)
         self.resting_Vm = 0  # Neuron resting membrane potential (mV)
         self.Rm = 10  # Specific membrane resistivity (k*omega*cm2)
         self.Cm = random.uniform(0.84, 1)  # Specific membrane capacitance (*mu*F/cm2)
@@ -24,18 +24,21 @@ class Neuron:
         self.Vm = self.resting_Vm  # Neuron membrane potential (mV)
         self.t_ref = 0  # Neuron refractory time left (ms)
         self.t = 0  # Neuron last updated time (ms)
-        self.fired_array = []
-        self.tracking_Vm = []
 
-    # Called once on all input neurons when current is about to be supplied to them.
+        # A list holding all the times the neuron has been fired
+        self.fired_list = []
+        # A list tracking the Vm of a neuron and the time at which the Vm corresponds to
+        self.tracking_Vm = [[self.Vm, self.t]]
+
+    # Called once on all input neurons when current is about to be supplied.
     def updateProperties(self, sim_time):
         delta_time = sim_time - self.t  # Time passed since last update
         self.Vm = self.Vm * math.exp(-delta_time / self.tau_m)  # Update new membrane potential
         self.t_ref -= delta_time  # Update refractory time left yet
         self.t = sim_time  # Update last updated time
 
-    # Called on every time step of the simulation on the neuron that's being supplied
-    # an input. Returns a boolean value saying if the input node has been fired or not.
+    # Called on every time step of the simulation on the neuron that an input is being supplied to.
+    # Returns a boolean value saying if the input node has been fired or not.
     def processInput(self, input_strength, sim_time, sim_time_step, debug=False, fired=False):
         self.t = sim_time
         # Check if during refractory period
@@ -51,7 +54,7 @@ class Neuron:
                 fired = True
                 self.t_ref = self.tau_ref
                 self.Vm = self.resting_Vm
-                self.fired_array.append(self.t)
+                self.fired_list.append(self.t)
         if debug:
             print(self.Vm)
         return fired

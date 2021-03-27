@@ -7,7 +7,7 @@ from view.SimulatorWindow import SimulatorWindow
 
 
 # The main window of the simulation. This window allows the user to edit the parameters of the model they want
-# to generate, and also pick which type of brain to generate. Having the GUI structured like this allows the user to
+# to generate, and also pick which type of brain to generate. The GUI is structured in a way that allows the user to
 # create as many Simulator Windows as they desire so they can make visual comparisons.
 class MainWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -22,8 +22,11 @@ class MainWindow(tk.Tk):
         s.configure('Parameters.TLabel', font='helvetica 12', foreground='black', padding=[5, 17, 5, 17])
         s.configure('Parameters.TEntry', font='helvetica 12', foreground='black', padding=[5, 7, 5, 7])
 
-        x = self.winfo_screenwidth() / 3.25  # width of the screen / 3.25
-        y = self.winfo_screenheight() / 4  # height of the screen / 4
+        width = 720
+        height = 480
+        # Centers the window
+        x = (self.winfo_screenwidth() / 2) - (width / 2)
+        y = (self.winfo_screenheight() / 2) - (height / 2)
         self.geometry('%dx%d+%d+%d' % (720, 480, x, y))
 
         # Set window title.
@@ -39,11 +42,11 @@ class MainWindow(tk.Tk):
         container.grid_columnconfigure(0, weight=1, uniform="factors")
         container.grid_columnconfigure(1, weight=1, uniform="factors")
 
-        neural_network_factors = ttk.Frame(container)
-        neural_network_factors.grid(row=0, column=0, sticky="nsew")
+        simulation_factors = ttk.Frame(container)
+        simulation_factors.grid(row=0, column=0, sticky="nsew")
         # Evens out any empty space either side of each column.
-        neural_network_factors.grid_columnconfigure(0, weight=1)
-        neural_network_factors.grid_columnconfigure(4, weight=1)
+        simulation_factors.grid_columnconfigure(0, weight=1)
+        simulation_factors.grid_columnconfigure(4, weight=1)
 
         aged_brain_factors = ttk.Frame(container)
         aged_brain_factors.grid(row=0, column=1, sticky="nsew")
@@ -67,38 +70,38 @@ class MainWindow(tk.Tk):
         exit_button = ttk.Button(window_toolbar, text="Exit", style='Exit.TButton', command=self.exitCommand)
         exit_button.pack(side="left")
 
-        # Neural network factors frame title - label.
-        self.neural_network_factors_title = ttk.Label(neural_network_factors, style='Title.TLabel',
-                                                      text="Neuron Network Factors")
-        self.neural_network_factors_title.grid(column=1, row=0, columnspan=3)
+        # Simulation factors frame title - label.
+        self.simulation_factors_title = ttk.Label(simulation_factors, style='Title.TLabel',
+                                                  text="Simulation Factors")
+        self.simulation_factors_title.grid(column=1, row=0, columnspan=3)
 
         # Number of input neurons - label and entry field.
         self.no_input_neu = tk.IntVar(value=10)
-        self.makeLabelAndEntry(neural_network_factors, "Number of Input Neurons", self.no_input_neu, 1, 1)
+        self.makeLabelAndEntry(simulation_factors, "Number of Input Neurons", self.no_input_neu, 1, 1)
 
         # Number of output neurons - label and entry field.
         self.no_output_neu = tk.IntVar(value=10)
-        self.makeLabelAndEntry(neural_network_factors, "Number of Output Neurons", self.no_output_neu, 1, 2)
+        self.makeLabelAndEntry(simulation_factors, "Number of Output Neurons", self.no_output_neu, 1, 2)
 
         # The strength of the input current being fed to an input neuron - label and entry field.
-        self.neu_input_curr = tk.IntVar(value=4)
-        self.makeLabelAndEntry(neural_network_factors, "Neuron Input Current (A)", self.neu_input_curr, 1, 3)
+        self.neu_input_curr = tk.StringVar(value=4)
+        self.makeLabelAndEntry(simulation_factors, "Neuron Input Current (A)", self.neu_input_curr, 1, 3)
 
         # The intervals of the input current being supplied to an input neuron - label and entry field.
-        self.neu_input_intervals = tk.IntVar(value=5)
-        self.makeLabelAndEntry(neural_network_factors, "Input Intervals (ms)", self.neu_input_intervals, 1, 4)
+        self.neu_input_intervals = tk.StringVar(value=5)
+        self.makeLabelAndEntry(simulation_factors, "Input Intervals (ms)", self.neu_input_intervals, 1, 4)
 
         # The total time the simulation will run for - label and entry field.
-        self.sim_end_time = tk.IntVar(value=500)
-        self.makeLabelAndEntry(neural_network_factors, "Simulation End Time (ms)", self.sim_end_time, 1, 5)
+        self.sim_end_time = tk.StringVar(value=500)
+        self.makeLabelAndEntry(simulation_factors, "Simulation End Time (ms)", self.sim_end_time, 1, 5)
 
         # The memory capacity of the neural network - label and entry field.
-        self.mem_capacity = tk.IntVar(value=100)
-        self.makeLabelAndEntry(neural_network_factors, "Memory Capacity (%)", self.mem_capacity, 1, 6)
+        self.mem_capacity = tk.StringVar(value=100)
+        self.makeLabelAndEntry(simulation_factors, "Memory Capacity (%)", self.mem_capacity, 1, 6)
 
         # The synaptic strength of the connections in the neural network - label and entry field.
-        self.synaptic_strength = tk.IntVar(value=7)
-        self.makeLabelAndEntry(neural_network_factors, "Synaptic Strength", self.synaptic_strength, 1, 7)
+        self.synaptic_strength = tk.StringVar(value=7)
+        self.makeLabelAndEntry(simulation_factors, "Synaptic Strength", self.synaptic_strength, 1, 7)
 
         # Aged brain factors frame title - label.
         self.aged_brain_factors_title = ttk.Label(aged_brain_factors, style='Title.TLabel', text="Aged Brain Factors")
@@ -124,8 +127,9 @@ class MainWindow(tk.Tk):
     # Makes a label and checkbutton side by side using the variables provided from the parameters.
     def makeLabelAndCheckbutton(self, master, text, variable, column, row):
         ttk.Label(master, style='Parameters.TLabel', text=text).grid(column=column, columnspan=2, row=row)
-        tk.Checkbutton(master, pady=2, padx=11, highlightbackground='black', selectcolor="red",
-                       activebackground="pink", indicatoron=False, background="white",
+        tk.Checkbutton(master, highlightbackground='black', highlightcolor='pink', selectcolor="red",
+                       activeforeground="red", activebackground="red",
+                       disabledforeground="white", background="white", indicatoron=False, padx=11, pady=2,
                        variable=variable).grid(column=(column + 2), row=row)
 
     # Turn off all the simulations that are running or are not the target_simulator before turning on the
