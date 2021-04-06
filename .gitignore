@@ -2,3 +2,5 @@ __pycache__/
 .idea/
 main.bin
 main.build
+analysis/ResultsAgedBrain.csv
+analysis/ResultsYoungBrain.csv

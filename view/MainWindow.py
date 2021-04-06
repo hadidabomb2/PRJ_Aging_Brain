@@ -9,9 +9,9 @@ from tkinter import ttk
 from view.SimulatorWindow import SimulatorWindow
 
 
-# The main window of the simulation. This window allows the user to edit the parameters of the model they want
-# to generate, and also pick which type of simulation to generate. The GUI is structured in a way that allows the user to
-# create as many Simulator Windows as they desire so they can make visual comparisons.
+# The main window of the simulation. This window allows the user to edit the parameters of the model they want to
+# generate, and also pick which type of simulation to generate. The GUI is structured in a way that allows the user
+# to create as many Simulator Windows as they desire so they can make visual comparisons.
 class MainWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -19,7 +19,6 @@ class MainWindow(tk.Tk):
         # The styling of the ttk items in this class.
         s = ttk.Style(self)
         s.configure('Generate.TButton', font='helvetica 14', foreground='black', padding=[10, 10, 10, 5])
-        s.configure('Generate2.TButton', font='helvetica 14', foreground='black', padding=[10, 10, 10, 5])
         s.configure('Exit.TButton', font='helvetica 14', foreground='red', padding=[5, 10, 5, 5])
         s.configure('Title.TLabel', font='helvetica 16', foreground='black', padding=[5, 15, 5, 10])
         s.configure('Parameters.TLabel', font='helvetica 12', foreground='black', padding=[5, 17, 5, 17])
@@ -168,8 +167,8 @@ class MainWindow(tk.Tk):
             simulator.exitCommand(self.removeSimulator)
         self.destroy()
 
-    # Generate a young simulation model. The young simulation model is exactly like the aged simulation model but any of the aged
-    # simulation factors are set to 0 meaning False.
+    # Generate a young simulation model. The young simulation model is exactly like the aged simulation model but any
+    # of the aged simulation factors are set to 0 meaning False.
     def generateYoungModel(self):
         # Stops simulations before generation of a new one so no inappropriate overlapping of methods occur.
         self.toggleSimulations(None)
@@ -180,8 +179,8 @@ class MainWindow(tk.Tk):
         # Add the simulator to the list of simulators.
         self.simulators.append(young_brain)
 
-    # Generate an aged simulation model. Act's similarly to the generateYoungModel(...) function but does not set the aged
-    # simulation factors to 0.
+    # Generate an aged simulation model. Act's similarly to the generateYoungModel(...) function but does not set the
+    # aged simulation factors to 0.
     def generateAgedModel(self):
         self.toggleSimulations(None)
         aged_brain = SimulatorWindow(self.sim_end_time.get(), self.inhibited_LTP.get(), self.no_input_neu.get(),

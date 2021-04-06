@@ -23,6 +23,10 @@ https://codeloop.org/how-to-create-textbox-in-python-tkinter/.
 The canvas drawings in the NeuralNetworkFrame.py file were partially inspired from the Bryan Oakley answer in the Jan 24, 2011 stack overflow post
 'tkinter: displaying a square grid': https://stackoverflow.com/questions/4781184/tkinter-displaying-a-square-grid.
 
+The code that displays the generated matplotlib figure in the ViewPropertiesWindows.py file has been learnt and adpated from the Eric Levieil answer in
+the July 15, 2015 stack overflow post 'Placing plot on Tkinter main window in Python':
+https://stackoverflow.com/questions/31440167/placing-plot-on-tkinter-main-window-in-python.
+
 ## Installation
 ### For Mac OS / Mac OS X
 * First install a GCC. This can be obtained by downloading and installing Xcode using the following link:

@@ -1,9 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 
-from analysis.BrainAnalysis import getDataFrameLists, getDataFrameGroupedByTimeAndMaximised
 from view.NeuralNetworkFrame import NeuralNetworkFrame
-import matplotlib.pyplot as plt
+from view.ViewPropertiesWindow import ViewPropertiesWindow
 
 
 # The simulator window that parses in the data received from the MainWindow, initialises the NeuralNetworkFrame class
@@ -25,6 +24,9 @@ class SimulatorWindow(tk.Tk):
         # the exit button.
         self.protocol("WM_DELETE_WINDOW", lambda: self.exitCommand(removeSimulator))
 
+        # Holds a list of properties windows that are generated.
+        self.properties_windows = []
+
         width = 720
         height = 720
         x = (self.winfo_screenwidth() / 2)
@@ -45,7 +47,7 @@ class SimulatorWindow(tk.Tk):
                                  command=lambda: self.exitCommand(removeSimulator))
         exit_button.pack(side="left")
         view_properties_button = ttk.Button(window_toolbar, style='RunSimulation.TButton', text="View Properties",
-                                       command=lambda: self.viewProperties(simulation_args))
+                                            command=lambda: self.viewProperties(simulation_args))
         view_properties_button.pack(side="right")
 
         # This holds all the arguments that need to be passed to the NeuralNetworkFrame in a certain order. The first
@@ -87,8 +89,13 @@ class SimulatorWindow(tk.Tk):
     # Closes the window safely. Setting the self.neural_network_frame.simulation.running to False stops the simulation
     # in the backend. Errors in tinker callbacks are raised if the backend is running but the SimulationWindow has been
     # closed, callback in the LearningSimulator.runSimulation(...) method leads to nothing. The removeSimulator
-    # callback leads to the MainWindow class.
+    # callback leads to the MainWindow class. Any opened properties windows belonging to this simulation are also
+    # closed.
     def exitCommand(self, removeSimulator):
+        properties_windows = self.properties_windows[:]
+        for properties_window in properties_windows:
+            properties_window.exitCommand(self.removePropertiesWindow)
+
         if self.neural_network_frame.simulation.running:
             self.neural_network_frame.simulation.running = False
         # Make callback to the main window to remove this simulator from the list of simulators it holds.
@@ -97,33 +104,12 @@ class SimulatorWindow(tk.Tk):
         self.destroy()
         print("Simulation Closed")
 
-    # Displays the properties page of the simulation
+    # Displays the properties page of the simulation.
     def viewProperties(self, neural_network_args):
-        # Plotting the total number of output neurons spiked by the time lapsed.
-        simulation = [self.neural_network_frame.simulation]
-        df = getDataFrameLists(simulation, "learned_times", getDataFrameGroupedByTimeAndMaximised)
-        fig = plt.figure(figsize=(15, 7))
-        # Display the model parameters on the right hand side of the graph.
-        plt.figtext(0.80, 0.83, "Model Parameters:", horizontalalignment='left', wrap=True, fontsize=15)
-        plt.figtext(0.80, 0.53, self.getModelParametersAsString(neural_network_args), horizontalalignment='left', wrap=True,
-                    fontsize=12)
-        plt.suptitle("Analysing Learning Times w/ " + self.title_text, fontsize=20)
-        plt.plot(df[0]['Time'], df[0]['No_Spiked'], linewidth=3)
-        plt.xlabel("Time (ms)")
-        plt.ylabel("No. of Output Nodes Spiked")
-        # Add space on the right side for the model parameters to fit.
-        fig.subplots_adjust(right=0.75)
-        # Show the graph with the properties on the right hand side.
-        plt.show()
+        self.properties_windows.append(ViewPropertiesWindow([self.neural_network_frame.simulation],
+                                                            neural_network_args, self.title_text,
+                                                            removePropertiesWindow=self.removePropertiesWindow))
 
-    # Returns the model parameters as a string with appropriate formatting.
-    def getModelParametersAsString(self, brain_args):
-        text = "Simulation End Time (ms): " + str(brain_args[0]) + "\n" + \
-               "Learning Type: " + str(brain_args[1]) + "\n" + \
-               "No. of Input Neurons: " + str(brain_args[2]) + "\n" + \
-               "No. of Output Neurons: " + str(brain_args[3]) + "\n" + \
-               "Memory Capacity (%): " + str(brain_args[4] * 100) + "\n" + \
-               "Synaptic Strength: " + str(brain_args[5]) + "\n" + \
-               "Input Intervals (ms): " + str(brain_args[6]) + "\n" + \
-               "Neuron Input Current (A): " + str(brain_args[7])
-        return text
+    # Removes a properties window from the list of properties windows.
+    def removePropertiesWindow(self, properties_window):
+        self.properties_windows.remove(properties_window)

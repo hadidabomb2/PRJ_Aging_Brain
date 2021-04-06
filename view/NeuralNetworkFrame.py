@@ -1,6 +1,6 @@
 """
 The canvas drawings were partially inspired from the Bryan Oakley answer in the Jan 24, 2011 stack overflow post
-'kinter: displaying a square grid': https://stackoverflow.com/questions/4781184/tkinter-displaying-a-square-grid
+'tkinter: displaying a square grid': https://stackoverflow.com/questions/4781184/tkinter-displaying-a-square-grid
 """
 
 import random
