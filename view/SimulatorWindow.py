@@ -1,7 +1,3 @@
-# https://stackoverflow.com/questions/2084069/create-a-csv-file-with-values-from-a-python-list
-# https://stackoverflow.com/questions/4781184/tkinter-displaying-a-square-grid
-# https://stackoverflow.com/questions/40843039/how-to-write-a-simple-callback-function
-
 import tkinter as tk
 from tkinter import ttk
 
@@ -10,8 +6,8 @@ from view.NeuralNetworkFrame import NeuralNetworkFrame
 import matplotlib.pyplot as plt
 
 
-# The simulator window that parses in the data received from the MainWindow, initialises the NeuralNetworkFrame class with
-# the appropriate arguments and deals with other window logic.
+# The simulator window that parses in the data received from the MainWindow, initialises the NeuralNetworkFrame class
+# with the appropriate arguments and deals with other window logic.
 class SimulatorWindow(tk.Tk):
     def __init__(self, end_time, learning_type_boolean, input_neu_size, output_neu_size, mem_capacity,
                  synaptic_strength, dec_synaptic_strength, inc_neurodegen, neu_input_intervals, neu_input_curr, title,
@@ -48,53 +44,53 @@ class SimulatorWindow(tk.Tk):
         exit_button = ttk.Button(window_toolbar, style='Exit.TButton', text="Exit",
                                  command=lambda: self.exitCommand(removeSimulator))
         exit_button.pack(side="left")
-        properties_button = ttk.Button(window_toolbar, style='RunSimulation.TButton', text="View Properties",
-                                       command=lambda: self.viewProperties(brain_args))
-        properties_button.pack(side="right")
+        view_properties_button = ttk.Button(window_toolbar, style='RunSimulation.TButton', text="View Properties",
+                                       command=lambda: self.viewProperties(simulation_args))
+        view_properties_button.pack(side="right")
 
         # This holds all the arguments that need to be passed to the NeuralNetworkFrame in a certain order. The first
         # element is the end_time.
-        brain_args = [float(end_time)]
+        simulation_args = [float(end_time)]
 
         # Learning types
         if learning_type_boolean == 0:  # If 'Inhibited LTP' was selected or not
-            brain_args.append('LTP')
+            simulation_args.append('LTP')
         else:
-            brain_args.append('MIS')
+            simulation_args.append('MIS')
 
         # Number of input and output neurons
         neu_dec_factor = 0.8
         if inc_neurodegen == 0:  # If 'Increased Neurodegeneration' was selected or not
-            brain_args.append(int(input_neu_size))
-            brain_args.append(int(output_neu_size))
+            simulation_args.append(int(input_neu_size))
+            simulation_args.append(int(output_neu_size))
         else:
-            brain_args.append(int(input_neu_size * neu_dec_factor))
-            brain_args.append(int(output_neu_size * neu_dec_factor))
+            simulation_args.append(int(input_neu_size * neu_dec_factor))
+            simulation_args.append(int(output_neu_size * neu_dec_factor))
 
         # Memory Capacity
-        brain_args.append(float(mem_capacity) / 100)
+        simulation_args.append(float(mem_capacity) / 100)
 
         # Synaptic Strength
         synaptic_strength_dec_factor = 0.6
         if dec_synaptic_strength == 0:  # If 'Decreased Synaptic Stength' was selected or not
-            brain_args.append(float(synaptic_strength))
+            simulation_args.append(float(synaptic_strength))
         else:
-            brain_args.append(float(synaptic_strength) * synaptic_strength_dec_factor)
+            simulation_args.append(float(synaptic_strength) * synaptic_strength_dec_factor)
 
         # Neuron input current and intervals
-        brain_args.append(float(neu_input_intervals))
-        brain_args.append(float(neu_input_curr))
+        simulation_args.append(float(neu_input_intervals))
+        simulation_args.append(float(neu_input_curr))
 
         # Create frame that will display the neural network.
-        self.brain_frame = NeuralNetworkFrame(brain_args, lambda: toggleSimulations(self), self)
+        self.neural_network_frame = NeuralNetworkFrame(simulation_args, lambda: toggleSimulations(self), self)
 
-    # Closes the window safely. Setting the self.brain_frame.brain.running to False stops the simulation in the backend.
-    # Errors in tinker callbacks are raised if the backend is running but the SimulationWindow has been closed, callback
-    # in the LearningSimulator.runSimulation(...) method leads to nothing. The removeSimulator callback leads to the
-    # MainWindow class.
+    # Closes the window safely. Setting the self.neural_network_frame.simulation.running to False stops the simulation
+    # in the backend. Errors in tinker callbacks are raised if the backend is running but the SimulationWindow has been
+    # closed, callback in the LearningSimulator.runSimulation(...) method leads to nothing. The removeSimulator
+    # callback leads to the MainWindow class.
     def exitCommand(self, removeSimulator):
-        if self.brain_frame.brain.running:
-            self.brain_frame.brain.running = False
+        if self.neural_network_frame.simulation.running:
+            self.neural_network_frame.simulation.running = False
         # Make callback to the main window to remove this simulator from the list of simulators it holds.
         removeSimulator(self)
         # Close the window.
@@ -102,14 +98,14 @@ class SimulatorWindow(tk.Tk):
         print("Simulation Closed")
 
     # Displays the properties page of the simulation
-    def viewProperties(self, brain_args):
+    def viewProperties(self, neural_network_args):
         # Plotting the total number of output neurons spiked by the time lapsed.
-        brain = [self.brain_frame.brain]
-        df = getDataFrameLists(brain, "learned_times", getDataFrameGroupedByTimeAndMaximised)
+        simulation = [self.neural_network_frame.simulation]
+        df = getDataFrameLists(simulation, "learned_times", getDataFrameGroupedByTimeAndMaximised)
         fig = plt.figure(figsize=(15, 7))
         # Display the model parameters on the right hand side of the graph.
         plt.figtext(0.80, 0.83, "Model Parameters:", horizontalalignment='left', wrap=True, fontsize=15)
-        plt.figtext(0.80, 0.53, self.getModelParametersAsString(brain_args), horizontalalignment='left', wrap=True,
+        plt.figtext(0.80, 0.53, self.getModelParametersAsString(neural_network_args), horizontalalignment='left', wrap=True,
                     fontsize=12)
         plt.suptitle("Analysing Learning Times w/ " + self.title_text, fontsize=20)
         plt.plot(df[0]['Time'], df[0]['No_Spiked'], linewidth=3)

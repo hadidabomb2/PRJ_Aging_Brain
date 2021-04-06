@@ -1,5 +1,8 @@
-# https://jakirkpatrick.wordpress.com/2012/02/01/making-a-hovering-box-in-tkinter/
-# https://codeloop.org/how-to-create-textbox-in-python-tkinter/
+"""
+The label and checkbutton creation methods (makeLabelAndEntry(...) & makeLabelAndCheckbutton(...)) were learnt and
+adpated from the 'How To Create TextBox In Python TKinter' tutorial on codeloop:
+https://codeloop.org/how-to-create-textbox-in-python-tkinter/
+"""
 
 import tkinter as tk
 from tkinter import ttk
@@ -7,7 +10,7 @@ from view.SimulatorWindow import SimulatorWindow
 
 
 # The main window of the simulation. This window allows the user to edit the parameters of the model they want
-# to generate, and also pick which type of brain to generate. The GUI is structured in a way that allows the user to
+# to generate, and also pick which type of simulation to generate. The GUI is structured in a way that allows the user to
 # create as many Simulator Windows as they desire so they can make visual comparisons.
 class MainWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -21,6 +24,10 @@ class MainWindow(tk.Tk):
         s.configure('Title.TLabel', font='helvetica 16', foreground='black', padding=[5, 15, 5, 10])
         s.configure('Parameters.TLabel', font='helvetica 12', foreground='black', padding=[5, 17, 5, 17])
         s.configure('Parameters.TEntry', font='helvetica 12', foreground='black', padding=[5, 7, 5, 7])
+
+        # Call the self.exitCommand method whenever the window is attempted to be closed in other ways than pressing
+        # the exit button.
+        self.protocol("WM_DELETE_WINDOW", lambda: self.exitCommand())
 
         width = 720
         height = 480
@@ -84,11 +91,11 @@ class MainWindow(tk.Tk):
         self.makeLabelAndEntry(simulation_factors, "Number of Output Neurons", self.no_output_neu, 1, 2)
 
         # The strength of the input current being fed to an input neuron - label and entry field.
-        self.neu_input_curr = tk.StringVar(value=4)
+        self.neu_input_curr = tk.StringVar(value=3.5)
         self.makeLabelAndEntry(simulation_factors, "Neuron Input Current (A)", self.neu_input_curr, 1, 3)
 
         # The intervals of the input current being supplied to an input neuron - label and entry field.
-        self.neu_input_intervals = tk.StringVar(value=5)
+        self.neu_input_intervals = tk.StringVar(value=2)
         self.makeLabelAndEntry(simulation_factors, "Input Intervals (ms)", self.neu_input_intervals, 1, 4)
 
         # The total time the simulation will run for - label and entry field.
@@ -100,10 +107,10 @@ class MainWindow(tk.Tk):
         self.makeLabelAndEntry(simulation_factors, "Memory Capacity (%)", self.mem_capacity, 1, 6)
 
         # The synaptic strength of the connections in the neural network - label and entry field.
-        self.synaptic_strength = tk.StringVar(value=7)
+        self.synaptic_strength = tk.StringVar(value=5)
         self.makeLabelAndEntry(simulation_factors, "Synaptic Strength", self.synaptic_strength, 1, 7)
 
-        # Aged brain factors frame title - label.
+        # Aged simulation factors frame title - label.
         self.aged_brain_factors_title = ttk.Label(aged_brain_factors, style='Title.TLabel', text="Aged Brain Factors")
         self.aged_brain_factors_title.grid(column=1, row=0, columnspan=2)
 
@@ -145,10 +152,10 @@ class MainWindow(tk.Tk):
     def toggleSimulations(self, target_simulator):
         simulators = self.simulators
         for simulator in simulators:
-            if (simulator is not target_simulator) and simulator.brain_frame.brain.running:
-                simulator.brain_frame.toggleRunSimulation()
+            if (simulator is not target_simulator) and simulator.neural_network_frame.simulation.running:
+                simulator.neural_network_frame.toggleRunSimulation()
         if target_simulator is not None:
-            target_simulator.brain_frame.toggleRunSimulation()
+            target_simulator.neural_network_frame.toggleRunSimulation()
 
     # Removes a simulator from the list of simulators.
     def removeSimulator(self, simulator):
@@ -161,8 +168,8 @@ class MainWindow(tk.Tk):
             simulator.exitCommand(self.removeSimulator)
         self.destroy()
 
-    # Generate a young brain model. The young brain model is exactly like the aged brain model but any of the aged
-    # brain factors are set to 0 meaning False.
+    # Generate a young simulation model. The young simulation model is exactly like the aged simulation model but any of the aged
+    # simulation factors are set to 0 meaning False.
     def generateYoungModel(self):
         # Stops simulations before generation of a new one so no inappropriate overlapping of methods occur.
         self.toggleSimulations(None)
@@ -173,8 +180,8 @@ class MainWindow(tk.Tk):
         # Add the simulator to the list of simulators.
         self.simulators.append(young_brain)
 
-    # Generate an aged brain model. Act's similarly to the generateYoungModel(...) function but does not set the aged
-    # brain factors to 0.
+    # Generate an aged simulation model. Act's similarly to the generateYoungModel(...) function but does not set the aged
+    # simulation factors to 0.
     def generateAgedModel(self):
         self.toggleSimulations(None)
         aged_brain = SimulatorWindow(self.sim_end_time.get(), self.inhibited_LTP.get(), self.no_input_neu.get(),

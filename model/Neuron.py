@@ -1,13 +1,7 @@
 """
-Create a basic LIF neuron class
-Based on http://neurdon.wpengine.com/2011/01/19/neural-modeling-with-python-part-1/
-- Some changes to the original model:
-- This class models the state of the neuron over time
-- The values have been modified to make the simulation work better (not based on any biological plausability)
-- Debugging has been added
-Requires Python 3.x and Numpy
+This class has been inspired and adapted from the article Neural Modeling with Python (Part 1) written by Byron
+Galbraith in Jan 19, 2011: http://neurdon.wpengine.com/2011/01/19/neural-modeling-with-python-part-1/.
 """
-import numpy as np
 import random
 import math
 

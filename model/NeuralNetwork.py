@@ -1,4 +1,8 @@
-# https://stackoverflow.com/questions/59148994/how-to-get-n-random-integer-numbers-whose-sum-is-equal-to-m
+"""
+The code used in the generateSynapticWeights(...) method was taken and adapted from the answers of RishiG and
+Sam Manson in the Dec 2019 stack overflow post 'How to get N random integer numbers whose sum is equal to M':
+https://stackoverflow.com/questions/59148994/how-to-get-n-random-integer-numbers-whose-sum-is-equal-to-m
+"""
 
 import numpy as np
 import random

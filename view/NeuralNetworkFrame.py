@@ -1,6 +1,7 @@
-# https://stackoverflow.com/questions/2084069/create-a-csv-file-with-values-from-a-python-list
-# https://stackoverflow.com/questions/4781184/tkinter-displaying-a-square-grid
-# https://stackoverflow.com/questions/40843039/how-to-write-a-simple-callback-function
+"""
+The canvas drawings were partially inspired from the Bryan Oakley answer in the Jan 24, 2011 stack overflow post
+'kinter: displaying a square grid': https://stackoverflow.com/questions/4781184/tkinter-displaying-a-square-grid
+"""
 
 import random
 import tkinter as tk
@@ -9,19 +10,20 @@ from tkinter import ttk
 from model.LearningSimulator import LearningSimulator
 
 
-# This class is inherits from a tk.Frame object and is responsible for displaying and running the main neural network
+# This class inherits from a tk.Frame object and is responsible for displaying and running the main neural network
 # in this simulation
 class NeuralNetworkFrame(ttk.Frame):
-    def __init__(self, brain_args, toggleSimulations, *args, **kwargs):
+    def __init__(self, simulation_args, toggleSimulations, *args, **kwargs):
         ttk.Frame.__init__(self, *args, **kwargs)
 
         # A common variable name referencing itself to fit the more standard practice of coding GUIs.
         container = self
         # Args ordering defined in SimulatorWindow file.
-        self.brain_args = brain_args
-        brain = LearningSimulator(brain_args[0], brain_args[1], brain_args[2], brain_args[3], brain_args[4], brain_args[5],
-                                  brain_args[6])
-        self.brain = brain
+        self.simulation_args = simulation_args
+        simulation = LearningSimulator(simulation_args[0], simulation_args[1], simulation_args[2], simulation_args[3],
+                                       simulation_args[4], simulation_args[5],
+                                       simulation_args[6])
+        self.simulation = simulation
 
         # The canvas that holds the neuron and connection representations. When the 'Run Simulation' button is pressed,
         # the canvas focuses, I have removed the highlight thickness so it does not show it being focused.
@@ -47,46 +49,13 @@ class NeuralNetworkFrame(ttk.Frame):
         self.neuron_width = 40
         self.neuron_height = 40
         # Lists that hold references to all of the appropriate item id's and item objects. This is needed to keep track
-        # of which elements in the brain reference which objects created to represent them in the canvas.
+        # of which elements in the simulation reference which objects created to represent them in the canvas.
         self.input_neurons = []
         self.output_neurons = []
         self.connections = []
         # This list is needed so we do not keep needlessly highlighting connections that underwent learning at older
         # timesteps. It holds the list of connections that have been changed/highlighted at previous timesteps.
         self.changed_learned_connections = []
-
-        brain_input_neurons = brain.neural_network.getInputNeuronsList()
-        brain_output_neurons = brain.neural_network.getOutputNeuronList()
-
-        # Adjusts the height of the neurons when the number of input and output neurons are uneven. Without this,
-        # there would always be trailing ovals at the end of the longer section. The centering balances it so the
-        # smaller section is appropriately vertically spaced.
-        input_centering = 0
-        output_centering = 0
-        height_diff = ((len(brain_input_neurons) - len(brain_output_neurons)) * self.neuron_height)
-        if height_diff > 0:
-            output_centering = height_diff / 2
-        elif height_diff < 0:
-            input_centering = abs(height_diff / 2)
-
-        # Holds the colours that each type of neuron state correlates to.
-        canvas_colours = {"input_neuron": "blue", "output_neuron": "green", "supplied_neuron": "orange red",
-                          "fired_neuron": "red"}
-        self.canvas_colours = canvas_colours
-
-        # The oval spacing defines how vertically spaced out each neuron is in each column.
-        oval_spacing = 7
-        # Display the neurons and connections.
-        self.displayNeuronsAsOvals(self.input_neurons, brain_input_neurons, oval_spacing, 1, canvas, input_centering,
-                                   canvas_colours["input_neuron"], "input_neuron")
-        self.displayNeuronsAsOvals(self.output_neurons, brain_output_neurons, oval_spacing, 10, canvas,
-                                   output_centering,
-                                   canvas_colours["output_neuron"], "output_neuron")
-        self.displayConnectionsAsLines(self.input_neurons, self.output_neurons, self.connections, canvas,
-                                       brain.neural_network)
-
-        # Draw the legend that displays which colours mean what.
-        self.drawCanvasLegend(canvas, canvas_colours)
 
         # Run simulation button which makes the callback to the MainWindow to call the toggleSimulations function.
         self.run_simulation = ttk.Button(canvas, style='RunSimulation.TButton', text="Run Simulation",
@@ -99,9 +68,42 @@ class NeuralNetworkFrame(ttk.Frame):
         self.run_simulation.pack(side="top")
         self.time_stamp.pack(side="bottom")
 
-    # Takes in a neuron list of the canvas, a neuron list of the brain and other configuration parameters to display
-    # each neuron as an oval in a single column. It also appends the neuron and the item id of the created oval
-    # belonging to the neuron to the neuron list of the canvas.
+        network_input_neurons = simulation.neural_network.getInputNeuronsList()
+        network_output_neurons = simulation.neural_network.getOutputNeuronList()
+
+        # Adjusts the height of the neurons when the number of input and output neurons are uneven. Without this,
+        # there would always be trailing ovals at the end of the longer section. The centering balances it so the
+        # smaller section is appropriately vertically spaced.
+        input_centering = 0
+        output_centering = 0
+        height_diff = ((len(network_input_neurons) - len(network_output_neurons)) * self.neuron_height)
+        if height_diff > 0:
+            output_centering = height_diff / 2
+        elif height_diff < 0:
+            input_centering = abs(height_diff / 2)
+
+        # Holds the colours that each type of neuron state correlates to.
+        canvas_colours = {"input_neuron": "blue", "output_neuron": "green", "supplied_neuron": "orange red",
+                          "fired_neuron": "red"}
+        self.canvas_colours = canvas_colours
+
+        # The oval spacing defines how vertically spaced out each neuron is in each column.
+        oval_spacing = 20
+        # Display the neurons and connections.
+        self.displayNeuronsAsOvals(self.input_neurons, network_input_neurons, oval_spacing, 1, canvas, input_centering,
+                                   canvas_colours["input_neuron"], "input_neuron")
+        self.displayNeuronsAsOvals(self.output_neurons, network_output_neurons, oval_spacing, 10, canvas,
+                                   output_centering,
+                                   canvas_colours["output_neuron"], "output_neuron")
+        self.displayConnectionsAsLines(self.input_neurons, self.output_neurons, self.connections, canvas,
+                                       simulation.neural_network)
+
+        # Draw the legend that displays which colours mean what.
+        self.drawCanvasLegend(canvas, canvas_colours)
+
+    # Takes in a neuron list of the canvas, a neuron list of the simulation and other configuration parameters to
+    # display each neuron as an oval in a single column. It also appends the neuron and the item id of the created
+    # oval belonging to the neuron to the neuron list of the canvas.
     def displayNeuronsAsOvals(self, neuron_list_canvas, neuron_list_brain, oval_spacing, horizontal_shift, canvas,
                               centering, fill, tag):
         for i, neuron in enumerate(neuron_list_brain):
@@ -125,7 +127,7 @@ class NeuralNetworkFrame(ttk.Frame):
         for input_neuron in input_neurons:
             # Find mid point of the input neuron of the connection to draw the line from.
             input_neuron_coords = canvas.coords(input_neuron[1])
-            x1 = (input_neuron_coords[2] + input_neuron_coords[0]) / 2
+            x1 = ((input_neuron_coords[2] + input_neuron_coords[0]) + self.neuron_width) / 2
             y1 = (input_neuron_coords[3] + input_neuron_coords[1]) / 2
             connections_list = neural_network.getInputNeuronConnections(input_neuron[0])
             for k, connection in enumerate(connections_list):
@@ -134,17 +136,17 @@ class NeuralNetworkFrame(ttk.Frame):
                 output_neuron_id = [x[1] for x in output_neurons if x[0] == output_neuron][0]
                 # Find mid point of the output neuron of the connection to draw the line to.
                 output_neuron_coords = canvas.coords(output_neuron_id)
-                x2 = (output_neuron_coords[2] + output_neuron_coords[0]) / 2
+                x2 = ((output_neuron_coords[2] + output_neuron_coords[0]) - self.neuron_width) / 2
                 y2 = (output_neuron_coords[3] + output_neuron_coords[1]) / 2
                 # Add a reference of the connection and line object (item id) created for it.
-                connections.append([connection, canvas.create_line(x1, y1, x2, y2, fill="grey",
+                connections.append([connection, canvas.create_line(x1, y1, x2, y2, fill="grey", dash=(1, 1),
                                                                    tags="connection")])
 
-    # Called by the MainWindow class. It stops the simulation by setting the running variable in the LearningSimulator to
-    # False and starts it again by calling the runSimulation(...) method in the LearningSimulator.
+    # Called by the MainWindow class. It stops the simulation by setting the running variable in the
+    # LearningSimulator to False and starts it again by calling the runSimulation(...) method in the LearningSimulator.
     def toggleRunSimulation(self):
-        if self.brain.running:
-            self.brain.running = False
+        if self.simulation.running:
+            self.simulation.running = False
             # Update the run_simulation button to say Run Simulation once you stop it.
             self.run_simulation.config(text="Run Simulation")
             print("Simulation Stopped")
@@ -153,18 +155,18 @@ class NeuralNetworkFrame(ttk.Frame):
             self.run_simulation.config(text="Stop Simulation")
             print("Simulation Started")
             # The connections only change in MIS so we call updateConnections only when the learning type is 'MIS'.
-            if self.brain.learning_type == 'MIS':
-                self.brain.runSimulation(self.brain_args[7], updateCanvas=self.updateCanvas,
-                                         updateConnections=self.updateConnections)
+            if self.simulation.learning_type == 'MIS':
+                self.simulation.runSimulation(self.simulation_args[7], updateCanvas=self.updateCanvas,
+                                              updateConnections=self.updateConnections)
             else:
-                self.brain.runSimulation(self.brain_args[7], updateCanvas=self.updateCanvas)
+                self.simulation.runSimulation(self.simulation_args[7], updateCanvas=self.updateCanvas)
 
         # Once the simulation is over, set the running value to False and update the GUI again.
-        if self.brain.running:
-            self.brain.running = False
+        if self.simulation.running:
+            self.simulation.running = False
             self.run_simulation.config(text="Simulation Has Ended, Run Another Iteration?")
             # Resetting the number of simulation steps to allow running for more iterations.
-            self.brain.resetNoOfSteps()
+            self.simulation.resetNoOfSteps()
             print("Simulation Ended")
 
     # This method removes an old connection and adds a new connection to the GUI. Only happens during MIS and if it
@@ -187,9 +189,9 @@ class NeuralNetworkFrame(ttk.Frame):
         input_neuron_coords = canvas.coords(input_neuron_id)
 
         # Find mid point of the input and output neuron coordinates
-        x1 = (input_neuron_coords[2] + input_neuron_coords[0]) / 2
+        x1 = ((input_neuron_coords[2] + input_neuron_coords[0]) + self.neuron_width) / 2
         y1 = (input_neuron_coords[3] + input_neuron_coords[1]) / 2
-        x2 = (output_neuron_coords[2] + output_neuron_coords[0]) / 2
+        x2 = ((output_neuron_coords[2] + output_neuron_coords[0]) - self.neuron_width) / 2
         y2 = (output_neuron_coords[3] + output_neuron_coords[1]) / 2
         # Finds the mid point between the input and output neurons and add a random appropriate value. This is
         # Necessary as otherwise, the new connection would simply overlap the already connected connection present,
@@ -199,22 +201,22 @@ class NeuralNetworkFrame(ttk.Frame):
 
         # The line is smoothed out looking like a curve.
         connections.append([new_connection, self.canvas.create_line(x1, y1, x3, y3, x2, y2, fill="grey", smooth=1,
-                                                                    tags="connection")])
+                                                                    dash=(1, 1), tags="connection")])
         # Update GUI
         self.update()
 
     # This method highlights the connection and neurons that undergo learning at a specific timestep. Once a connection
-    # is highlighted, it stays highlighted but the neurons reset their colour. It is called at the end of the
-    # runSimulation(...) if passed through by parameters (check toggleRunSimulation(...) method).
+    # is highlighted, it stays highlighted but the neurons reset their colour. It is called at the end of the loop in
+    # the runSimulation(...) if passed through by parameters (check toggleRunSimulation(...) method).
     def updateCanvas(self):
         # Update time_stamp label to display current time in the simulation.
         self.time_stamp.config(text=self.getTimeStampText())
         canvas = self.canvas
-        learned_connections = self.brain.learned_connections
+        learned_connections = self.simulation.learned_connections
         input_neurons = self.input_neurons
         connections = self.connections
         changed_learned_connections = self.changed_learned_connections
-        chosen_input_neuron = self.brain.chosen_input_neuron
+        chosen_input_neuron = self.simulation.chosen_input_neuron
 
         # Reset all neuron colours.
         for input_neuron in input_neurons:
@@ -223,15 +225,15 @@ class NeuralNetworkFrame(ttk.Frame):
         for output_neuron in output_neurons:
             canvas.itemconfig(output_neuron[1], fill=self.canvas_colours["output_neuron"])
 
-        # Get the connections that got added to the learned_connections list at the current timestamp. They are the
-        # unchanged connections we need to highlight as they are currently undergoing learning according to our
-        # simulation.
-        unchanged_learned_connections = [x for x in learned_connections if x not in changed_learned_connections]
-
-        # Highlight the neuron that is being current is being supplied to.
+        # Highlight the neuron current is being supplied to.
         if chosen_input_neuron:
             chosen_input_neuron_id = [x[1] for x in input_neurons if x[0] == chosen_input_neuron][0]
             canvas.itemconfig(chosen_input_neuron_id, fill=self.canvas_colours["supplied_neuron"])
+
+        # Get the connections that got added to the learned_connections list at the current timestep. They are the
+        # unchanged connections we need to highlight as they are currently undergoing learning according to our
+        # simulation.
+        unchanged_learned_connections = [x for x in learned_connections if x not in changed_learned_connections]
 
         # Highlight all the connections in the unchanged_learned_connections list and append the connection to the
         # changed_learned_connections list.
@@ -242,7 +244,7 @@ class NeuralNetworkFrame(ttk.Frame):
             fill = self.canvas_colours["fired_neuron"]
             canvas.itemconfig(output_neuron_id, fill=fill)
             canvas.itemconfig(input_neuron_id, fill=fill)
-            canvas.itemconfig(connection_id, fill=fill, width=2)
+            canvas.itemconfig(connection_id, fill=fill, width=2, dash=())
             changed_learned_connections.append(learned_connection)
         # Update GUI
         self.update()
@@ -255,7 +257,7 @@ class NeuralNetworkFrame(ttk.Frame):
     # Returns the time of the simulation in a viewable format. It is formatted to always be adjusted
     # to 5 decimal places.
     def getTimeStampText(self):
-        return "Time Stamp: " + '{:.5f}'.format((round(self.brain.time, 5))) + ' ms'
+        return "Time Stamp: " + '{:.5f}'.format((round(self.simulation.time, 5))) + ' ms'
 
     # Draws the legend on the canvas. Since lengths of labels are all varied, it was easier to manually transform the
     # coordinates on the x-axis with the help of the transformXCoordsLegend(...) helper function below. Technically,
