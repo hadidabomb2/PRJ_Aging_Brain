@@ -49,6 +49,7 @@ class Neuron:
                 self.t_ref = self.tau_ref
                 self.Vm = self.resting_Vm
                 self.fired_list.append(self.t)
+        # Used for manual testing
         if debug:
-            print(self.Vm)
+            print(self, self.Vm)
         return fired

@@ -112,6 +112,6 @@ class NeuralNetwork:
     def getNeuralNetwork(self):
         return self.neural_network
 
-
-if __name__ == '__main__':
-    NeuralNetwork(30, 30, 1, 5)
+# Used for manual testing
+# if __name__ == '__main__':
+#     NeuralNetwork(30, 30, 1, 5)

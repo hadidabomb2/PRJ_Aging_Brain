@@ -46,6 +46,11 @@ class LearningSimulator:
         # Start the simulation
         self.running = True
         while int(self.no_steps) > 0:
+            # Used for manual testing
+            if debug:
+                print("Running: " + str(self.running) + '.')
+                print("No. of steps: " + str(self.no_steps) + '.')
+                print("No. of learned connections: " + str(len(self.learned_connections)) + '.')
             if not self.running:
                 # Stop the simulation
                 break
@@ -90,7 +95,8 @@ class LearningSimulator:
                             output_neuron.updateProperties(self.time)
                             connection_strength = input_connection.getConnectionStrength()
                             # Record if output neuron has been fired.
-                            output_fired = output_neuron.processInput(connection_strength, self.time, timestep)
+                            output_fired = output_neuron.processInput(connection_strength, self.time, timestep,
+                                                                      debug=debug)
                             if output_fired:
                                 if learning_type == 'MIS':
                                     # Total LTP inhibition is almost never the case, normally, MIS just becomes more
