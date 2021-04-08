@@ -24,7 +24,8 @@ def getDataFrameByVm(values):
 
 # Creates and returns a list of DataFrame objects. It loops through a list of BrainSimulators, extracting the required
 # list name from each simulator and uses a grouping method that have been defined above to create a DataFrame object to
-# append to the list of DataFrame objects.
+# append to the list of DataFrame objects. getDataFrameGroupedByTimeAndMaximised(...) and getDataFrameByVm(...) are the
+# two currently used grouping methods for this function.
 def getDataFrameLists(brain_list, list_name, groupingMethod):
     df_list = []
     for brain in brain_list:
