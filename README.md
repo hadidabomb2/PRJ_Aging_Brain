@@ -160,7 +160,7 @@ Now you're ready to run the app!
 
 ### For Mac OS / Mac OS X / Linux
 * First navigate to this project folder where this README file is located using the terminal.
-* Run the following command:
+* Run the following command and respond yes to any prompts that come up:
 ```bash
 $ python3 -m nuitka main.py
 ```
@@ -184,11 +184,11 @@ Mac OS / Mac OS X as the simulation will run quite slowly otherwise.
 
 ### For Windows
 * First navigate to this project folder where this README file is located using the Windows Command Prompt.
-* Run the following command:
+* Run the following command and respond yes to any prompts that come up:
 ```bash
 $ python -m nuitka main.py
 ```
-This will generate optimised source code for a MinGW64 based C compiler.
+This will generate optimised source code for a MinGW64 based C compiler by default.
 * Finally run the last command:
 ```bash
 $ main.exe
@@ -235,16 +235,8 @@ run this simulation much better than other compilers such as Clang/LLVM on OS X.
 Nuitka is not strictly necessary on these Linux distributions but is still helpful
 in reducing possible overhead and make certain checks. It also displays the simulation in the best format as Linux
 distributions do not have as much GUI restrictions such as the button height being unchangable on Mac operating
-systems.
-
-The Windows 7/10 are the least preferred choice of operating systems as the Windows systems themselves are not as programming
-friendly as what Mac or Linux offers. There are also two Windows operating system specific bugs when running the simulation.
-The first one is the fact that the simulation runs slowly in comparison to Mac or Linux operating systems. This seems like a
-specific issue based on the MinGW64 C11 compiler on Windows which is automatically installed on Windows by Nuitka if not
-found. The second bug is triggered when the user presses the view properties button while the simulation
-is running; the simulation running in the background is stopped even though the running boolean value in the 
-LearningSimulator object is still set to True. Pressing the run simulation button twice continues running the simulation
-as normal again. It seems like the matplotlib.pyplot.show() method is responsible for this bug on Windows.
+systems. The Windows 7/10 are the least preferred choice of operating systems as the Windows systems themselves are not as programming
+friendly as what Mac or Linux offers.
 
 A detail to note is that the Ubuntu Linux 16.04 LTS will no longer be supported by April 30, 2021. This means
 that the Ubuntu 16.04 LTS will stop receiving security patches or other software updates by April 30, 2021. This is
