@@ -92,6 +92,7 @@ class SimulatorWindow(tk.Tk):
     # callback leads to the MainWindow class. Any opened properties windows belonging to this simulation are also
     # closed.
     def exitCommand(self, removeSimulator):
+        # If the simulation was not constructed properly, do not go through further logic and just destroy the window.
         if not hasattr(self, 'neural_network_frame'):
             self.destroy()
         else:
