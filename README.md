@@ -1,4 +1,4 @@
-# Simulation of the Aging Brain
+# Learning Simulation of the Brain
 This is a Python implementation simulating the learning process in the ageing brain and also
 offers a graphical user interface (GUI) for easier user interactions. The simulation 
 parameters can be modified by changing the source code or through the GUI before each model 
