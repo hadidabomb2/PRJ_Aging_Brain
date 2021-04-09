@@ -210,7 +210,7 @@ quite slowly otherwise.
 * https://nuitka.net/doc/user-manual.html#id3
 * https://pypi.org/project/Nuitka/
 
-## System Requirements (& Possible Issues)
+## System Requirements
 ### Minimum Requirements
 There are not any specific minimum requirements as long as the latest version of Python 3 can be installed on your
 computer. Any modern day computer should be able to install and run Python 3 so unless you have a very out-dated 
@@ -241,3 +241,12 @@ friendly as what Mac or Linux offers.
 A detail to note is that the Ubuntu Linux 16.04 LTS will no longer be supported by April 30, 2021. This means
 that the Ubuntu 16.04 LTS will stop receiving security patches or other software updates by April 30, 2021. This is
 why Ubuntu 18.04+ LTS was recommended even though Ubuntu Linux 16.04 LTS would run this application perfectly fine.
+
+## Bugs & Errors
+All the known bugs and errors in this application arise from the passing of inappropriate parameters to the Learning Simulator class. This can be done through both the GUI and the analysis generator that the user can interact with. The following list contains the inappropriate parameters for the Learning Simulator class:
+
+* When the input or output neuron amount is less than 1.
+* When the synaptic strength is less than 0.
+* When the memory capacity is more than 100\% (105\% in specific because of integer casting and float-rounding functions).
+* When the output neuron amount multiplied by the memory capacity is less than or equal to 1 (0.5 in specific because of integer casting and float-rounding functions).
+* When the values for any of the simulation factors contain a non-number, i.e. string or character.

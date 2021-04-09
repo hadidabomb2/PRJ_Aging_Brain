@@ -92,17 +92,20 @@ class SimulatorWindow(tk.Tk):
     # callback leads to the MainWindow class. Any opened properties windows belonging to this simulation are also
     # closed.
     def exitCommand(self, removeSimulator):
-        properties_windows = self.properties_windows[:]
-        for properties_window in properties_windows:
-            properties_window.exitCommand(self.removePropertiesWindow)
+        if not hasattr(self, 'neural_network_frame'):
+            self.destroy()
+        else:
+            properties_windows = self.properties_windows[:]
+            for properties_window in properties_windows:
+                properties_window.exitCommand(self.removePropertiesWindow)
 
-        if self.neural_network_frame.simulation.running:
-            self.neural_network_frame.simulation.running = False
-        # Make callback to the main window to remove this simulator from the list of simulators it holds.
-        removeSimulator(self)
-        # Close the window.
-        self.destroy()
-        print("Simulation Closed")
+            if self.neural_network_frame.simulation.running:
+                self.neural_network_frame.simulation.running = False
+            # Make callback to the main window to remove this simulator from the list of simulators it holds.
+            removeSimulator(self)
+            # Close the window.
+            self.destroy()
+            print("Simulation Closed")
 
     # Displays the properties page of the simulation.
     def viewProperties(self, neural_network_args):
